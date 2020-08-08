@@ -4,3 +4,4 @@ models/**/*
 log/**/*
 data/**/*
 bert/**/*
+docs/_build/**/*
