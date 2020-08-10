@@ -1,6 +1,6 @@
 """
-datasets_test.py - Module - The datasets_test.py module contains all unit tests related to
-the datasets.py module.
+model_evaluation_test.py - The model_evaluation_test.py module contains all unit tests related to
+the model_evaluation.py module.
 """
 import unittest
 

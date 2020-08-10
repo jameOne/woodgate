@@ -1,6 +1,5 @@
 """
-model_evaluation_test.py - Module - The model_evaluation_test.py module contains all unit tests related to
-the model_evaluation.py module.
+
 """
 import unittest
 

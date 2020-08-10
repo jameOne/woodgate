@@ -5,3 +5,4 @@ log/**/*
 data/**/*
 bert/**/*
 docs/_build/**/*
+.pytest_cache

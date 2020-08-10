@@ -1,6 +1,5 @@
 """
-text_processor.py - This file contains the Preprocessor class which encapsulates logic related to
-processing clean text for intent detection by BERT.
+fine_tuning_text_processor.py - This fine_tuning_text_processor.py module contains the TextPreprocessor class definition.
 """
 import os
 import tqdm
@@ -8,10 +7,10 @@ import numpy as np
 from bert.tokenization.bert_tokenization import FullTokenizer
 
 
-class TextProcessor:
+class FineTuningTextProcessor:
     """
-    TextProcessor - Class which encapsulates utilities related to processing clean text for intent
-    detection by BERT.
+    TextProcessor - The TextProcessor class encapsulates logic related to processing clean text
+    (in CSV format) used to train BERT for intent detection.
     """
     DATA_COLUMN = os.getenv("DATA_COLUMN", "text")
     LABEL_COLUMN = os.getenv("LABEL_COLUMN", "intent")
@@ -29,7 +28,7 @@ class TextProcessor:
         self.intents = intents
         ((self.train_x, self.train_y), (self.test_x, self.test_y)) = \
             map(self._prepare, [train, test])
-        print("max seq_len", self.max_sequence_length)
+        # print("max seq_len", self.max_sequence_length)
         self.max_sequence_length = min(self.max_sequence_length, max_sequence_length)
         self.train_x, self.test_x = map(
             self._pad,
@@ -40,8 +39,8 @@ class TextProcessor:
         x, y = [], []
         for _, row in tqdm.tqdm(df.iterrows()):
             text, label = \
-                row[TextProcessor.DATA_COLUMN], \
-                row[TextProcessor.LABEL_COLUMN]
+                row[FineTuningTextProcessor.DATA_COLUMN], \
+                row[FineTuningTextProcessor.LABEL_COLUMN]
             tokens = self.tokenizer.tokenize(text)
             tokens = ["[CLS]"] + tokens + ["[SEP]"]
             token_ids = self.tokenizer.convert_tokens_to_ids(tokens)

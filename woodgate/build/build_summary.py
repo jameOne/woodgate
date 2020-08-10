@@ -1,16 +1,15 @@
 """
-build_summary.py - Module - The build_summary.py module contains the BuildSummary class definition
-which encapsulates logic related to summarizing the build.
+build_summary.py - The build_summary.py module contains the BuildSummary class definition.
 """
 import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-from build_configuration import BuildConfiguration
+from .build_configuration import BuildConfiguration
 
 
 class BuildSummary:
     """
-    BuildSummary - Class - The BuildSummary class encapsulates logic related to summarizing the
+    BuildSummary - The BuildSummary class encapsulates logic related to summarizing the
     model build.
     """
 

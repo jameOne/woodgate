@@ -9,10 +9,10 @@ import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 
-from build_configuration import BuildConfiguration
-from datasets import Datasets
-from model_definition import ModelDefinition
-from text_processor import TextProcessor
+from ..build.build_configuration import BuildConfiguration
+from ..fine_tuning.fine_tuning_datasets import FineTuningDatasets
+from ..model.model_definition import ModelDefinition
+from ..fine_tuning.fine_tuning_text_processor import FineTuningTextProcessor
 
 
 class ModelEvaluation:
@@ -52,7 +52,7 @@ class ModelEvaluation:
         :rtype:
         """
         y_pred = bert_model.predict(data.test_x).argmax(axis=-1)
-        print(classification_report(data.test_y, y_pred, target_names=Datasets.all_intents))
+        print(classification_report(data.test_y, y_pred, target_names=FineTuningDatasets.all_intents))
 
     @staticmethod
     def create_confusion_matrix(bert_model, data):
@@ -66,10 +66,10 @@ class ModelEvaluation:
         :rtype:
         """
         y_pred = bert_model.predict(data.test_x).argmax(axis=-1)
-        print(classification_report(data.test_y, y_pred, target_names=Datasets.all_intents))
+        print(classification_report(data.test_y, y_pred, target_names=FineTuningDatasets.all_intents))
         # Confusion matrix
         cm = confusion_matrix(data.test_y, y_pred)
-        df_cm = pd.DataFrame(cm, index=Datasets.all_intents, columns=Datasets.all_intents)
+        df_cm = pd.DataFrame(cm, index=FineTuningDatasets.all_intents, columns=FineTuningDatasets.all_intents)
 
         heat_map = sns.heatmap(df_cm, annot=True, fmt="d")
         heat_map.yaxis.set_ticklabels(heat_map.yaxis.get_ticklabels(), rotation=0, ha='right')
@@ -89,7 +89,7 @@ class ModelEvaluation:
         :return:
         :rtype:
         """
-        pred_tokens = map(ModelDefinition.tokenizer.tokenize, Datasets.regression_data[TextProcessor.DATA_COLUMN])
+        pred_tokens = map(ModelDefinition.tokenizer.tokenize, FineTuningDatasets.regression_data[FineTuningTextProcessor.DATA_COLUMN])
         pred_tokens = map(lambda tok: ["[CLS]"] + tok + ["[SEP]"], pred_tokens)
         pred_token_ids = list(map(ModelDefinition.tokenizer.convert_tokens_to_ids, pred_tokens))
 
@@ -99,5 +99,5 @@ class ModelEvaluation:
 
         predictions = bert_model.predict(pred_token_ids).argmax(axis=-1)
 
-        for utterance, intent in zip(Datasets.regression_data[TextProcessor.DATA_COLUMN], predictions):
-            print("utterance:", utterance, "\nintent:", Datasets.all_intents[intent])
+        for utterance, intent in zip(FineTuningDatasets.regression_data[FineTuningTextProcessor.DATA_COLUMN], predictions):
+            print("utterance:", utterance, "\nintent:", FineTuningDatasets.all_intents[intent])

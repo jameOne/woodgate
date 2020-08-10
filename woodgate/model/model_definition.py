@@ -8,7 +8,7 @@ import tensorflow as tf
 from tensorflow import keras
 from bert import BertModelLayer
 from bert.tokenization.bert_tokenization import FullTokenizer
-from build_configuration import BuildConfiguration
+from woodgate.build.build_configuration import BuildConfiguration
 
 
 class ModelDefinition:
@@ -16,7 +16,7 @@ class ModelDefinition:
     ModelDefinition - Class - The ModelDefinition class encapsulates logic related to defining the model
     architecture.
     """
-    BERT_DIR = os.getenv("BERT_DIR", os.path.join(BuildConfiguration.BASE_DIR, "bert"))
+    BERT_DIR = os.getenv("BERT_DIR", os.path.join(BuildConfiguration.WOODGATE_BASE_DIR, "bert"))
     os.makedirs(BERT_DIR, exist_ok=True)
 
     BERT_CONFIG = os.getenv("BERT_CONFIG", os.path.join(BERT_DIR, "bert_config.json"))

@@ -1,6 +1,6 @@
 """
-text_processor_test.py - Module - The text_processor_test.py module contains all unit tests related to
-the text_processor.py module.
+model_fit_test.py - Module - The model_fit_test.py module contains all unit tests related to
+the model_fit.py module.
 """
 import unittest
 

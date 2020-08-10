@@ -17,7 +17,7 @@ WORKDIR /home/james/build
 
 CMD ["python", "main.py"]
 
-#RUN python main.py
+#RUN python woodgate_process.py
 #
 #FROM tensorflow/serving:latest-gpu
 #
