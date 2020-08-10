@@ -1,6 +1,6 @@
 FROM tensorflow/tensorflow:latest-gpu
 
-COPY ./additional_requirements.txt /home/james/additional_requirements.txt
+COPY additional_requirements.txt /home/james/additional_requirements.txt
 
 WORKDIR /home/james
 
@@ -9,7 +9,7 @@ RUN pip install --upgrade pip \
 
 RUN mkdir build
 
-COPY . ./build
+COPY woodgate ./build
 
 ENV MPLCONFIGDIR=/home/james/build/output
 
