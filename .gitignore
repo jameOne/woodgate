@@ -6,3 +6,4 @@ data/**/*
 bert/**/*
 docs/_build/**/*
 .pytest_cache
+./**/__pycache__/
