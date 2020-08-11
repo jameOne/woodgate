@@ -15,15 +15,12 @@ class ModelStorage:
 
     MODEL_DIR = os.path.join(BuildConfiguration.OUTPUT_DIR, BuildConfiguration.MODEL_NAME)
 
-    @classmethod
-    def save_model_to_disk(cls, bert_model):
+    @staticmethod
+    def save_model_to_disk(bert_model, model_dir):
         """
 
         :param bert_model:
-        :type bert_model:
-        :param saved_model_path:
-        :type saved_model_path:
+        :param model_dir:
         :return:
-        :rtype:
         """
-        keras.models.save_model(bert_model, cls.MODEL_DIR)
+        keras.models.save_model(bert_model, model_dir)

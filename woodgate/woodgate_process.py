@@ -3,18 +3,18 @@ woodgate_process.py - The woodgate_process.py module contains the Woodgate class
 """
 import datetime
 
-from woodgate.build.build_logger import BuildLogger
-from woodgate.build.build_configuration import BuildConfiguration
-from woodgate.fine_tuning.fine_tuning_text_processor import FineTuningTextProcessor
-from woodgate.model.model_definition import ModelDefinition
-from woodgate.fine_tuning.fine_tuning_datasets import FineTuningDatasets
-from woodgate.build.build_summary import BuildSummary
-from woodgate.model.model_evaluation import ModelEvaluation
-from woodgate.model.model_fit import ModelFit
-from woodgate.model.model_summary import ModelSummary
-from woodgate.model.model_compiler import ModelCompiler
-from woodgate.model.model_storage import ModelStorage
-from woodgate.build.build_sanity_check import BuildSanityCheck
+from .build.build_logger import BuildLogger
+from .build.build_configuration import BuildConfiguration
+from .fine_tuning.fine_tuning_text_processor import FineTuningTextProcessor
+from .model.model_definition import ModelDefinition
+from .fine_tuning.fine_tuning_datasets import FineTuningDatasets
+from .build.build_summary import BuildSummary
+from .model.model_evaluation import ModelEvaluation
+from .model.model_fit import ModelFit
+from .model.model_summary import ModelSummary
+from .model.model_compiler import ModelCompiler
+from .model.model_storage import ModelStorage
+from .build.build_sanity_check import BuildSanityCheck
 
 
 class WoodgateProcess:
@@ -22,6 +22,8 @@ class WoodgateProcess:
     WoodgateProcess - The WoodgateProcess class encapsulates the build process. This class should have only
     a single static method `WoodgateProcess.run()` which takes no arguments.
     """
+
+    build_configuration = BuildConfiguration()
 
     @staticmethod
     def run():
@@ -32,9 +34,9 @@ class WoodgateProcess:
         """
         start_time = datetime.datetime.now()
         BuildLogger.LOGGER.info("woodgate process started:", start_time)
-
-        BuildLogger.LOGGER.info("Creating fine tuning dataset visuals:", BuildConfiguration.create_dataset_visuals)
-        if BuildConfiguration.create_dataset_visuals:
+        build_configuration = BuildConfiguration()
+        BuildLogger.LOGGER.info("Creating fine tuning dataset visuals:", build_configuration.create_dataset_visuals)
+        if build_configuration.create_dataset_visuals:
             BuildLogger.LOGGER.info("Creating bar plots of intent classification bins/buckets")
             bar_plots_created_successfully = False
             try:
@@ -83,8 +85,8 @@ class WoodgateProcess:
         BuildLogger.LOGGER.info("Generating build history")
         build_history = ModelFit.fit(bert_model=bert_model, data=data)
 
-        BuildLogger.LOGGER.info("Creating build history visuals:", BuildConfiguration.create_build_visuals)
-        if BuildConfiguration.create_build_visuals:
+        BuildLogger.LOGGER.info("Creating build history visuals:", build_configuration.create_build_visuals)
+        if build_configuration.create_build_visuals:
             BuildLogger.LOGGER.info("Creating plot of accuracy vs. epochs")
             accuracy_over_epochs_plot_created_successfully = False
             try:
