@@ -10,14 +10,14 @@ class ModelCompiler:
     ModelCompiler - The ModelCompiler class encapsulates logic related to compiling the model.
     """
 
-    LEARNING_RATE = os.getenv("LEARNING_RATE", "1e-5")
-    try:
-        LEARNING_RATE = float(LEARNING_RATE)
-    except ValueError:
-        LEARNING_RATE = 1e-5
+    learning_rate = float(os.getenv("LEARNING_RATE", "1e-5"))
+    if learning_rate <= 0 or learning_rate > 1:
+        raise ValueError(
+            "check LEARNING_RATE env var: " +
+            "learning rate must be an integer value between (0-1]")
 
     @staticmethod
-    def compile(bert_model):
+    def compile(bert_model: keras.Model):
         """
 
         :param bert_model:
@@ -25,8 +25,8 @@ class ModelCompiler:
         :return:
         :rtype:
         """
-        compiled_model = bert_model.compile(
-            optimizer=keras.optimizers.Adam(ModelCompiler.LEARNING_RATE),
+        compiled_model: keras.Model = bert_model.compile(
+            optimizer=keras.optimizers.Adam(ModelCompiler.learning_rate),
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")]
         )

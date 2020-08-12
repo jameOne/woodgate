@@ -1,6 +1,7 @@
 """
 model_summary.py - The model_summary.py module contains the ModelSummary class definition.
 """
+from tensorflow import keras
 
 
 class ModelSummary:
@@ -9,7 +10,7 @@ class ModelSummary:
     """
 
     @staticmethod
-    def summarize(bert_model):
+    def summarize(bert_model: keras.Model):
         """
 
         :param bert_model:

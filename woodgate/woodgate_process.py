@@ -13,7 +13,7 @@ from .model.model_evaluation import ModelEvaluation
 from .model.model_fit import ModelFit
 from .model.model_summary import ModelSummary
 from .model.model_compiler import ModelCompiler
-from .model.model_storage import ModelStorage
+from .model.model_storage import ModelStorageStrategy
 from .build.build_sanity_check import BuildSanityCheck
 
 
@@ -33,99 +33,126 @@ class WoodgateProcess:
         :rtype:
         """
         start_time = datetime.datetime.now()
-        BuildLogger.LOGGER.info("woodgate process started:", start_time)
+        BuildLogger.logger.info("Woodgate process started:", start_time)
+
+        BuildLogger.logger.info("Initializing build configuration")
         build_configuration = BuildConfiguration()
-        BuildLogger.LOGGER.info("Creating fine tuning dataset visuals:", build_configuration.create_dataset_visuals)
+        BuildLogger.logger.info("Creating fine tuning dataset visuals:", build_configuration.create_dataset_visuals)
+
+        fine_tuning_datasets = FineTuningDatasets(build_configuration=build_configuration)
+
         if build_configuration.create_dataset_visuals:
-            BuildLogger.LOGGER.info("Creating bar plots of intent classification bins/buckets")
+            BuildLogger.logger.info("Creating bar plots of intent classification bins/buckets")
             bar_plots_created_successfully = False
             try:
-                FineTuningDatasets.create_intents_bar_plots()
+                fine_tuning_datasets.create_intents_bar_plots()
                 bar_plots_created_successfully = True
             except OSError as err:
-                BuildLogger.LOGGER.error(err)
+                BuildLogger.logger.error(err)
             finally:
-                BuildLogger.LOGGER.error("An unknown error occurred while creating bar plots from fine tuning data")
-            BuildLogger.LOGGER.info("Bar plots of fine tuning data created:", bar_plots_created_successfully)
+                BuildLogger.logger.error("An unknown error occurred while creating bar plots from fine tuning data")
+            BuildLogger.logger.info("Bar plots of fine tuning data created:", bar_plots_created_successfully)
 
-            BuildLogger.LOGGER.info("Creating venn diagrams of intent classification bins/buckets")
+            BuildLogger.logger.info("Creating venn diagrams of intent classification bins/buckets")
             venn_diagrams_created_successfully = False
             try:
-                FineTuningDatasets.create_intents_venn_diagrams()
+                fine_tuning_datasets.create_intents_venn_diagrams()
                 venn_diagrams_created_successfully = True
             except OSError as err:
-                BuildLogger.LOGGER.error(err)
+                BuildLogger.logger.error(err)
             finally:
-                BuildLogger.LOGGER.error("An unknown error occurred while creating venn diagrams from fine tuning data")
-            BuildLogger.LOGGER.info("Venn diagrams of fine tuning data created:", venn_diagrams_created_successfully)
+                BuildLogger.logger.error("An unknown error occurred while creating venn diagrams from fine tuning data")
+            BuildLogger.logger.info("Venn diagrams of fine tuning data created:", venn_diagrams_created_successfully)
 
-        BuildLogger.LOGGER.info("Processing textual data for training")
+        BuildLogger.logger.info("Initializing model definition")
+        model_definition = ModelDefinition(build_configuration=build_configuration)
+        BuildLogger.logger.info("Processing textual data for training")
+
         data = FineTuningTextProcessor(
-            FineTuningDatasets.training_data,
-            FineTuningDatasets.testing_data,
-            ModelDefinition.tokenizer,
-            FineTuningDatasets.all_intents
+            fine_tuning_datasets.training_data,
+            fine_tuning_datasets.testing_data,
+            model_definition.tokenizer,
+            fine_tuning_datasets.all_intents
         )
 
-        BuildLogger.LOGGER.info("train x shape: ", data.train_x.shape)
-        BuildLogger.LOGGER.info("train x element example: ", data.train_x[0])
-        BuildLogger.LOGGER.info("train y element example: ", data.train_y[0])
-        BuildLogger.LOGGER.info("data max_length_sequence", data.max_sequence_length)
+        BuildLogger.logger.info("train x shape: ", data.train_x.shape)
+        BuildLogger.logger.info("train x element example: ", data.train_x[0])
+        BuildLogger.logger.info("train y element example: ", data.train_y[0])
+        BuildLogger.logger.info("data max_length_sequence", data.max_sequence_length)
 
-        BuildLogger.LOGGER.info("Creating BERT model")
-        bert_model = ModelDefinition.create_model(data.max_sequence_length, len(FineTuningDatasets.all_intents))
+        BuildLogger.logger.info("Creating BERT model")
+        bert_model = model_definition.create_model(data.max_sequence_length, len(fine_tuning_datasets.all_intents))
 
         summary = ModelSummary.summarize(bert_model=bert_model)
-        BuildLogger.LOGGER.info("BERT model Summary:\n", summary)
+        BuildLogger.logger.info("BERT model Summary:\n", summary)
 
-        BuildLogger.LOGGER.info("Compiling BERT model")
+        BuildLogger.logger.info("Compiling BERT model")
         ModelCompiler.compile(bert_model=bert_model)
-        BuildLogger.LOGGER.info("BERT model compilation complete")
+        BuildLogger.logger.info("BERT model compilation complete")
 
-        BuildLogger.LOGGER.info("Generating build history")
-        build_history = ModelFit.fit(bert_model=bert_model, data=data)
+        BuildLogger.logger.info("Initializing model fit")
+        model_fit = ModelFit(build_configuration=build_configuration)
 
-        BuildLogger.LOGGER.info("Creating build history visuals:", build_configuration.create_build_visuals)
+        BuildLogger.logger.info("Generating build history")
+        build_history = model_fit.fit(bert_model=bert_model, data=data)
+
+        BuildLogger.logger.info("Creating build history visuals:", build_configuration.create_build_visuals)
         if build_configuration.create_build_visuals:
-            BuildLogger.LOGGER.info("Creating plot of accuracy vs. epochs")
+            BuildLogger.logger.info("Initializing build summary")
+
+            build_summary = BuildSummary(build_configuration=build_configuration)
+
+            BuildLogger.logger.info("Creating plot of accuracy vs. epochs")
             accuracy_over_epochs_plot_created_successfully = False
             try:
-                BuildSummary.create_accuracy_over_epochs_plot(build_history=build_history)
+                build_summary.create_accuracy_over_epochs_plot(build_history=build_history)
                 accuracy_over_epochs_plot_created_successfully = True
             except OSError as err:
-                BuildLogger.LOGGER.error(err)
+                BuildLogger.logger.error(err)
             finally:
-                BuildLogger.LOGGER.error(
+                BuildLogger.logger.error(
                     "An unknown error occurred while creating accuracy over epochs plot from build history")
-            BuildLogger.LOGGER.info(
+            BuildLogger.logger.info(
                 "Plot of accuracy vs. epochs created:", accuracy_over_epochs_plot_created_successfully)
 
-            BuildLogger.LOGGER.info("Creating plot of loss vs. epochs")
+            BuildLogger.logger.info("Creating plot of loss vs. epochs")
             loss_over_epochs_plot_created_successfully = False
             try:
-                BuildSummary.create_loss_over_epochs_plot(build_history=build_history)
+                build_summary.create_loss_over_epochs_plot(build_history=build_history)
                 loss_over_epochs_plot_created_successfully = True
             except OSError as err:
-                BuildLogger.LOGGER.error(err)
+                BuildLogger.logger.error(err)
             finally:
-                BuildLogger.LOGGER.error(
+                BuildLogger.logger.error(
                     "An unknown error occurred while creating loss over epochs plot from build history")
-            BuildLogger.LOGGER.info(
+            BuildLogger.logger.info(
                 "Plot of loss vs. epochs created:", loss_over_epochs_plot_created_successfully)
 
-        BuildLogger.LOGGER.info("Starting model evaluation")
-        BuildLogger.LOGGER.info("Evaluating model accuracy")
-        ModelEvaluation.evaluate_model_accuracy(bert_model=bert_model, data=data)
-        BuildLogger.LOGGER.info("Creating classification report")
-        ModelEvaluation.create_classification_report(bert_model=bert_model, data=data)
-        BuildLogger.LOGGER.info("Creating confusion matrix")
-        ModelEvaluation.create_confusion_matrix(bert_model=bert_model, data=data)
-        BuildLogger.LOGGER.info("Performing regression testing")
-        ModelEvaluation.perform_regression_testing(bert_model=bert_model, data=data)
-        BuildLogger.LOGGER.info("Storing model on disk")
-        ModelStorage.save_model_to_disk(bert_model=bert_model)
+        BuildLogger.logger.info("Initializing model evaluation")
+        model_evaluation = ModelEvaluation(
+            build_configuration=build_configuration,
+            model_definition=model_definition,
+            fine_tuning_datasets=fine_tuning_datasets
+        )
 
-        BuildLogger.LOGGER.info("Sanity checking build process")
-        BuildSanityCheck.check_sanity(data)
+        BuildLogger.logger.info("Evaluating model accuracy")
+        model_evaluation.evaluate_model_accuracy(bert_model=bert_model, data=data)
+        BuildLogger.logger.info("Creating classification report")
+        model_evaluation.create_classification_report(bert_model=bert_model, data=data)
+        BuildLogger.logger.info("Creating confusion matrix")
+        model_evaluation.create_confusion_matrix(bert_model=bert_model, data=data)
+        BuildLogger.logger.info("Performing regression testing")
+        model_evaluation.perform_regression_testing(bert_model=bert_model, data=data)
+
+        BuildLogger.logger.info("Initializing model storage strategy")
+        model_storage_strategy = ModelStorageStrategy(build_configuration)
+        BuildLogger.logger.info("Saving model to disk")
+        model_storage_strategy.save_model_to_disk(bert_model=bert_model)
+
+        BuildLogger.logger.info("Initializing sanity check")
+        build_sanity_check = BuildSanityCheck(model_storage_strategy=model_storage_strategy)
+
+        BuildLogger.logger.info("Checking build sanity")
+        build_sanity_check.check_sanity(data)
         build_duration = datetime.datetime.now() - start_time
-        BuildLogger.LOGGER.info("Build process completed:", build_duration)
+        BuildLogger.logger.info("Build process completed:", build_duration)

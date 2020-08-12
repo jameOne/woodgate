@@ -16,19 +16,41 @@ class ModelDefinition:
     ModelDefinition - Class - The ModelDefinition class encapsulates logic related to defining the model
     architecture.
     """
-    BERT_DIR = os.getenv("BERT_DIR", os.path.join(BuildConfiguration.WOODGATE_BASE_DIR, "bert"))
-    os.makedirs(BERT_DIR, exist_ok=True)
 
-    BERT_CONFIG = os.getenv("BERT_CONFIG", os.path.join(BERT_DIR, "bert_config.json"))
+    def __init__(self, build_configuration: BuildConfiguration):
+        """
 
-    BERT_MODEL = os.getenv("BERT_MODEL", os.path.join(BERT_DIR, "bert_model.ckpt"))
+        :param build_configuration:
+        """
 
-    tokenizer = FullTokenizer(
-        vocab_file=os.path.join(BERT_DIR, "vocab.txt")
-    )
+        #: The `bert_dir` attribute represents the path to a directory on the host file system containing the
+        #: BERT model. This attribute is set via the `BERT_DIR` environment variable.
+        #: For example, consider the following script:
+        #: # Download BERT model
+        #: wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-12_H-768_A-12.zip
+        #:
+        #: mkdir ~/models
+        #: mkdir ~/models/bert
+        #:
+        #: # Unzip the file
+        #: unzip uncased_L-12_H-768_A-12.zip -d ~/models/bert
+        #:
+        #: `~/models/bert` would be the bert_dir environment variable.
+        #: If the `BERT_DIR` environment variable is not set, then the `bert_dir` attribute defaults to:
+        #: `$WOODGATE_BASE_DIR/bert`. The program will attempt to create `BERT_DIR` if it does not already
+        #: exist.
+        self.bert_dir: str = os.getenv("BERT_DIR", os.path.join(build_configuration.woodgate_base_dir, "bert"))
+        os.makedirs(self.bert_dir, exist_ok=True)
 
-    @staticmethod
-    def create_model(max_sequence_length, number_of_intents):
+        self.bert_config: str = os.getenv("BERT_CONFIG", os.path.join(self.bert_dir, "bert_config.json"))
+
+        self.bert_model: str = os.getenv("BERT_MODEL", os.path.join(self.bert_dir, "bert_model.ckpt"))
+
+        self.tokenizer: FullTokenizer = FullTokenizer(
+            vocab_file=os.path.join(self.bert_dir, "vocab.txt")
+        )
+
+    def create_model(self, max_sequence_length: int, number_of_intents: int):
         """
         ModelDefinition.create_model - Method - The create_model method is a helper which accepts
         max input sequence length and the number of intents (or bins/buckets). The logic returns a
@@ -42,7 +64,7 @@ class ModelDefinition:
         :rtype: keras.Model
         """
 
-        with tf.io.gfile.GFile(ModelDefinition.BERT_CONFIG) as reader:
+        with tf.io.gfile.GFile(self.bert_config) as reader:
             bc = StockBertConfig.from_json_string(reader.read())
             bert_params = map_stock_config_to_params(bc)
             bert_params.adapter_size = None
@@ -57,9 +79,9 @@ class ModelDefinition:
         logits = keras.layers.Dropout(0.5)(logits)
         logits = keras.layers.Dense(units=number_of_intents, activation="softmax")(logits)
 
-        model = keras.Model(inputs=input_ids, outputs=logits)
+        model: keras.Model = keras.Model(inputs=input_ids, outputs=logits)
         model.build(input_shape=(None, max_sequence_length))
 
-        load_stock_weights(bert, ModelDefinition.BERT_MODEL)
+        load_stock_weights(bert, self.bert_model)
 
         return model

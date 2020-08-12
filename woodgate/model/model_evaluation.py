@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+from tensorflow import keras
 
 from ..build.build_configuration import BuildConfiguration
 from ..fine_tuning.fine_tuning_datasets import FineTuningDatasets
@@ -21,16 +22,27 @@ class ModelEvaluation:
     evaluating the model build.
     """
 
+    def __init__(
+            self,
+            build_configuration: BuildConfiguration,
+            model_definition: ModelDefinition,
+            fine_tuning_datasets: FineTuningDatasets,
+    ):
+        self.evaluation_dir = build_configuration.evaluation_dir
+        self.tokenizer = model_definition.tokenizer
+        self.all_intents = fine_tuning_datasets.all_intents
+        self.regression_data = fine_tuning_datasets.regression_data
+
     @staticmethod
-    def evaluate_model_accuracy(bert_model, data):
+    def evaluate_model_accuracy(
+            bert_model: keras.Model,
+            data: FineTuningTextProcessor
+    ):
         """
 
         :param bert_model:
-        :type bert_model:
         :param data:
-        :type data:
         :return:
-        :rtype:
         """
         # Model evaluation
         print("MODEL EVALUATION")
@@ -40,36 +52,32 @@ class ModelEvaluation:
         print("train acc", train_acc)
         print("test acc", test_acc)
 
-    @staticmethod
-    def create_classification_report(bert_model, data):
+    def create_classification_report(
+            self,
+            bert_model: keras.Model,
+            data: FineTuningTextProcessor
+    ):
         """
 
         :param bert_model:
-        :type bert_model:
         :param data:
-        :type data:
         :return:
-        :rtype:
         """
         y_pred = bert_model.predict(data.test_x).argmax(axis=-1)
-        print(classification_report(data.test_y, y_pred, target_names=FineTuningDatasets.all_intents))
+        print(classification_report(data.test_y, y_pred, target_names=self.all_intents))
 
-    @staticmethod
-    def create_confusion_matrix(bert_model, data):
+    def create_confusion_matrix(self, bert_model, data):
         """
 
         :param bert_model:
-        :type bert_model:
         :param data:
-        :type data:
         :return:
-        :rtype:
         """
         y_pred = bert_model.predict(data.test_x).argmax(axis=-1)
-        print(classification_report(data.test_y, y_pred, target_names=FineTuningDatasets.all_intents))
+        print(classification_report(data.test_y, y_pred, target_names=self.all_intents))
         # Confusion matrix
         cm = confusion_matrix(data.test_y, y_pred)
-        df_cm = pd.DataFrame(cm, index=FineTuningDatasets.all_intents, columns=FineTuningDatasets.all_intents)
+        df_cm = pd.DataFrame(cm, index=self.all_intents, columns=self.all_intents)
 
         heat_map = sns.heatmap(df_cm, annot=True, fmt="d")
         heat_map.yaxis.set_ticklabels(heat_map.yaxis.get_ticklabels(), rotation=0, ha='right')
@@ -79,19 +87,18 @@ class ModelEvaluation:
         plt.title('Confusion matrix')
         plt.tight_layout()
         plt.savefig(os.path.join(
-            BuildConfiguration.EVALUATION_DIR, "confusion_matrix.png"))
+            self.evaluation_dir, "confusion_matrix.png"))
         plt.figure().clear()
 
-    @staticmethod
-    def perform_regression_testing(bert_model, data):
+    def perform_regression_testing(self, bert_model, data: FineTuningTextProcessor):
         """
 
         :return:
         :rtype:
         """
-        pred_tokens = map(ModelDefinition.tokenizer.tokenize, FineTuningDatasets.regression_data[FineTuningTextProcessor.DATA_COLUMN])
+        pred_tokens = map(self.tokenizer.tokenize, self.regression_data[FineTuningTextProcessor.DATA_COLUMN])
         pred_tokens = map(lambda tok: ["[CLS]"] + tok + ["[SEP]"], pred_tokens)
-        pred_token_ids = list(map(ModelDefinition.tokenizer.convert_tokens_to_ids, pred_tokens))
+        pred_token_ids = list(map(self.tokenizer.convert_tokens_to_ids, pred_tokens))
 
         pred_token_ids = map(
             lambda token_ids: token_ids + [0] * (data.max_sequence_length - len(token_ids)), pred_token_ids)
@@ -99,5 +106,5 @@ class ModelEvaluation:
 
         predictions = bert_model.predict(pred_token_ids).argmax(axis=-1)
 
-        for utterance, intent in zip(FineTuningDatasets.regression_data[FineTuningTextProcessor.DATA_COLUMN], predictions):
-            print("utterance:", utterance, "\nintent:", FineTuningDatasets.all_intents[intent])
+        for utterance, intent in zip(self.regression_data[FineTuningTextProcessor.DATA_COLUMN], predictions):
+            print("utterance:", utterance, "\nintent:", self.all_intents[intent])

@@ -13,14 +13,18 @@ class BuildSummary:
     model build.
     """
 
-    @staticmethod
-    def create_loss_over_epochs_plot(build_history):
+    def __init__(self, build_configuration: BuildConfiguration):
+        """
+
+        :param build_configuration:
+        """
+        self.output_dir = build_configuration.output_dir
+
+    def create_loss_over_epochs_plot(self, build_history):
         """
 
         :param build_history:
-        :type build_history:
         :return:
-        :rtype:
         """
 
         ax = plt.figure().gca()
@@ -34,11 +38,10 @@ class BuildSummary:
         plt.title('Loss over training epochs')
         plt.tight_layout()
         plt.savefig(os.path.join(
-            BuildConfiguration.OUTPUT_DIR, "post_train_summary", "loss_over_epochs.png"))
+            self.output_dir, "training_summary", "loss_over_epochs.png"))
         plt.figure().clear()
 
-    @staticmethod
-    def create_accuracy_over_epochs_plot(build_history):
+    def create_accuracy_over_epochs_plot(self, build_history):
         """
         
         :param build_history: 
@@ -58,5 +61,5 @@ class BuildSummary:
         plt.title('Accuracy over training epochs')
         plt.tight_layout()
         plt.savefig(os.path.join(
-            BuildConfiguration.OUTPUT_DIR, "post_train_summary", "accuracy_over_epochs.png"))
+            self.output_dir, "training_summary", "accuracy_over_epochs.png"))
         plt.figure().clear()

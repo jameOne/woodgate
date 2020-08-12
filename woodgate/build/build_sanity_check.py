@@ -3,8 +3,9 @@ build_sanity_check.py - The build_sanity_check.py module contains the SanityChec
 """
 from tensorflow import keras
 
-from ..model.model_storage import ModelStorage
+from ..model.model_storage import ModelStorageStrategy
 from ..model.model_evaluation import ModelEvaluation
+from ..fine_tuning.fine_tuning_text_processor import FineTuningTextProcessor
 
 
 class BuildSanityCheck:
@@ -14,8 +15,14 @@ class BuildSanityCheck:
     learning model.
     """
 
-    @staticmethod
-    def check_sanity(data):
+    def __init__(self, model_storage_strategy: ModelStorageStrategy):
+        """
+
+        :param model_storage_strategy:
+        """
+        self.model_build_dir = model_storage_strategy.model_build_dir
+
+    def check_sanity(self, data: FineTuningTextProcessor):
         """
 
         :param data:
@@ -23,5 +30,5 @@ class BuildSanityCheck:
         :return:
         :rtype:
         """
-        loaded_bert_model = keras.models.load_model(ModelStorage.MODEL_DIR)
+        loaded_bert_model = keras.models.load_model(self.model_build_dir)
         ModelEvaluation.perform_regression_testing(loaded_bert_model, data)

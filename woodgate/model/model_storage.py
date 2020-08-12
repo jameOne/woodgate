@@ -2,25 +2,27 @@
 model_storage.py - The model_storage.py module contains the ModelStorage class which encapsulates logic related to
 persisting the model after fine tuning.
 """
-import os
 from ..build.build_configuration import BuildConfiguration
 from tensorflow import keras
 
 
-class ModelStorage:
+class ModelStorageStrategy:
     """
-    ModelStorage - Class - The ModelStorage class encapsulates logic related to
+    ModelStorage - The ModelStorage class encapsulates logic related to
     persisting the model after fine tuning.
     """
 
-    MODEL_DIR = os.path.join(BuildConfiguration.OUTPUT_DIR, BuildConfiguration.MODEL_NAME)
+    def __init__(self, build_configuration: BuildConfiguration):
+        """
 
-    @staticmethod
-    def save_model_to_disk(bert_model, model_dir):
+        :param build_configuration:
+        """
+        self.model_build_dir = build_configuration.model_build_dir
+
+    def save_model_to_disk(self, bert_model: keras.Model):
         """
 
         :param bert_model:
-        :param model_dir:
         :return:
         """
-        keras.models.save_model(bert_model, model_dir)
+        keras.models.save_model(bert_model, self.model_build_dir)
