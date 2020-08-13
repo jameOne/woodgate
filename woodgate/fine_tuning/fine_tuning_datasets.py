@@ -305,7 +305,7 @@ class FineTuningDatasets:
         #: . The `testing_intents_counts` attribute is set by
         #: calling `self.testing_data.intent.value_counts()`
         #: dataframe.
-        self.testing_intents_counts = \
+        self.testing_intents_counts: object = \
             self.testing_data.intent.value_counts()
 
         #: The `evaluation_data` attribute represents the fine
@@ -318,7 +318,8 @@ class FineTuningDatasets:
         #: (labelled fine_tuning_text_processor.data_column_title)
         #: , and one (1) for `label` i.e. the intent (labelled
         #: fine_tuning_text_processor.label_column_title)
-        self.evaluation_data = pd.read_csv(self.evaluation_path)
+        self.evaluation_data: pd.DataFrame = \
+            pd.read_csv(self.evaluation_path)
 
         #: The `evaluation_intents_list` attribute represents a
         #: list of unique intents found in the
@@ -327,7 +328,7 @@ class FineTuningDatasets:
         #: a Python list of all unique values found in the column
         #: with title "intent" in the `self.evaluation_data`
         #: dataframe.
-        self.evaluation_intents_list = \
+        self.evaluation_intents_list: List[str] = \
             self.evaluation_data.intent.unique().tolist()
 
         #: The `evaluation_intents_set` attribute represents a set
@@ -336,7 +337,7 @@ class FineTuningDatasets:
         #: a Python set of values found in the column
         #: with title "intent" in the `self.evaluation_data`
         #: dataframe.
-        self.evaluation_intents_set = \
+        self.evaluation_intents_set: Set[str] = \
             set(self.evaluation_intents_list)
 
         #: The `evaluation_intents_counts` attribute represents a
@@ -345,7 +346,7 @@ class FineTuningDatasets:
         #: attribute is set by calling
         #: `self.testing_data.intent.value_counts()`
         #: dataframe.
-        self.evaluation_intents_counts = \
+        self.evaluation_intents_counts: object = \
             self.evaluation_data.intent.value_counts()
 
         #: The `regression_data` attribute represents the fine
@@ -358,7 +359,8 @@ class FineTuningDatasets:
         #: (labelled fine_tuning_text_processor.data_column_title)
         #: , and one (1) for `label` i.e. the intent (labelled
         #: fine_tuning_text_processor.label_column_title)
-        self.regression_data = pd.read_csv(self.regression_path)
+        self.regression_data: pd.DataFrame = \
+            pd.read_csv(self.regression_path)
 
         #: The `evaluation_intents_list` attribute represents a
         #: list of unique intents found in the
@@ -367,7 +369,7 @@ class FineTuningDatasets:
         #: a Python list of all unique values found in the column
         #: with title "intent" in the `self.evaluation_data`
         #: dataframe.
-        self.regression_intents_list = \
+        self.regression_intents_list: List[str] = \
             self.regression_data.intent.unique().tolist()
 
         #: The `regression_intents_set` attribute represents a set
@@ -376,7 +378,7 @@ class FineTuningDatasets:
         #: a Python set of values found in the column
         #: with title "intent" in the `self.regression_data`
         #: dataframe.
-        self.regression_intents_set = \
+        self.regression_intents_set: Set[str] = \
             set(self.regression_intents_list)
 
         #: The `regression_intents_counts` attribute represents a
@@ -385,13 +387,13 @@ class FineTuningDatasets:
         #: attribute is set by calling
         #: `self.testing_data.intent.value_counts()`
         #: dataframe.
-        self.regression_intents_counts = \
+        self.regression_intents_counts: object = \
             self.regression_data.intent.value_counts()
 
         #: The `all_intents` attribute represents a list of all
         #: unique intents present in the training, testing,
         #: evaluation, and regression datasets.
-        self.all_intents = list(
+        self.all_intents: List[str] = list(
             set(
                 self.training_intents_list
                 + self.testing_intents_list
@@ -426,8 +428,8 @@ class FineTuningDatasets:
 
         # It would be unusual for the set of testing intents to be
         # unequal to the set of training intents.
-        if (self.num_of_training_intents
-            - self.num_of_testing_intents) != 0:
+        if self.num_of_training_intents \
+                - self.num_of_testing_intents != 0:
             WoodgateLogger.logger.warn(
                 "number of training intents "
                 + f"({self.num_of_training_intents}) "
@@ -437,8 +439,8 @@ class FineTuningDatasets:
 
         # It would be unusual for the set of evaluation intents
         # to be unequal to the set of training intents.
-        if (self.num_of_training_intents
-            - self.num_of_evaluation_intents) != 0:
+        if self.num_of_training_intents \
+                - self.num_of_evaluation_intents != 0:
             WoodgateLogger.logger.warn(
                 "number of training intents "
                 + f"({self.num_of_training_intents}) "
@@ -448,8 +450,8 @@ class FineTuningDatasets:
 
         # It would be unusual for the set of regression intents
         # to be unequal to the set of training intents.
-        if (self.num_of_training_intents
-            - self.num_of_regression_intents) != 0:
+        if self.num_of_training_intents \
+                - self.num_of_regression_intents != 0:
             WoodgateLogger.logger.warn(
                 "number of training intents "
                 + f"({self.num_of_regression_intents}) "
