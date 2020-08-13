@@ -15,7 +15,7 @@ class ModelFit:
     def __init__(self, build_configuration: BuildConfiguration):
         #: The `create_tensorboard_logs` attribute represents a signal variable that is used
         #: to decide whether tensorboard logs should be generated along with build logs.
-        #: This attribute is set via the `CREATE_TENSORBOARD_LOGs` environment
+        #: This attribute is set via the `CREATE_TENSORBOARD_LOGS` environment
         #: variable. If the `CREATE_TENSORBOARD_LOGS` environment variable is not set, then
         #: the `create_tensorboard_logs` attribute is set to `1` by default signaling the program to generate
         #: tensorboard logs. All values except `CREATE_TENSORBOARD_LOGS=0` signal the program to generate

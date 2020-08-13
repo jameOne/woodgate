@@ -3,7 +3,7 @@ woodgate_process.py - The woodgate_process.py module contains the Woodgate class
 """
 import datetime
 
-from .build.build_logger import BuildLogger
+from woodgate.woodgate_logger import WoodgateLogger
 from .build.build_configuration import BuildConfiguration
 from .fine_tuning.fine_tuning_text_processor import FineTuningTextProcessor
 from .model.model_definition import ModelDefinition
@@ -13,7 +13,7 @@ from .model.model_evaluation import ModelEvaluation
 from .model.model_fit import ModelFit
 from .model.model_summary import ModelSummary
 from .model.model_compiler import ModelCompiler
-from .model.model_storage import ModelStorageStrategy
+from .model.model_storage_strategy import ModelStorageStrategy
 from .build.build_sanity_check import BuildSanityCheck
 
 
@@ -33,40 +33,42 @@ class WoodgateProcess:
         :rtype:
         """
         start_time = datetime.datetime.now()
-        BuildLogger.logger.info("Woodgate process started:", start_time)
+        WoodgateLogger.logger.info("Woodgate process started:", start_time)
 
-        BuildLogger.logger.info("Initializing build configuration")
+        WoodgateLogger.logger.info("Initializing build configuration")
         build_configuration = BuildConfiguration()
-        BuildLogger.logger.info("Creating fine tuning dataset visuals:", build_configuration.create_dataset_visuals)
+        WoodgateLogger.logger.info("Creating fine tuning dataset visuals:", build_configuration.create_dataset_visuals)
+
+
 
         fine_tuning_datasets = FineTuningDatasets(build_configuration=build_configuration)
 
         if build_configuration.create_dataset_visuals:
-            BuildLogger.logger.info("Creating bar plots of intent classification bins/buckets")
+            WoodgateLogger.logger.info("Creating bar plots of intent classification bins/buckets")
             bar_plots_created_successfully = False
             try:
                 fine_tuning_datasets.create_intents_bar_plots()
                 bar_plots_created_successfully = True
             except OSError as err:
-                BuildLogger.logger.error(err)
+                WoodgateLogger.logger.error(err)
             finally:
-                BuildLogger.logger.error("An unknown error occurred while creating bar plots from fine tuning data")
-            BuildLogger.logger.info("Bar plots of fine tuning data created:", bar_plots_created_successfully)
+                WoodgateLogger.logger.error("An unknown error occurred while creating bar plots from fine tuning data")
+            WoodgateLogger.logger.info("Bar plots of fine tuning data created:", bar_plots_created_successfully)
 
-            BuildLogger.logger.info("Creating venn diagrams of intent classification bins/buckets")
+            WoodgateLogger.logger.info("Creating venn diagrams of intent classification bins/buckets")
             venn_diagrams_created_successfully = False
             try:
                 fine_tuning_datasets.create_intents_venn_diagrams()
                 venn_diagrams_created_successfully = True
             except OSError as err:
-                BuildLogger.logger.error(err)
+                WoodgateLogger.logger.error(err)
             finally:
-                BuildLogger.logger.error("An unknown error occurred while creating venn diagrams from fine tuning data")
-            BuildLogger.logger.info("Venn diagrams of fine tuning data created:", venn_diagrams_created_successfully)
+                WoodgateLogger.logger.error("An unknown error occurred while creating venn diagrams from fine tuning data")
+            WoodgateLogger.logger.info("Venn diagrams of fine tuning data created:", venn_diagrams_created_successfully)
 
-        BuildLogger.logger.info("Initializing model definition")
+        WoodgateLogger.logger.info("Initializing model definition")
         model_definition = ModelDefinition(build_configuration=build_configuration)
-        BuildLogger.logger.info("Processing textual data for training")
+        WoodgateLogger.logger.info("Processing textual data for training")
 
         data = FineTuningTextProcessor(
             fine_tuning_datasets.training_data,
@@ -75,84 +77,84 @@ class WoodgateProcess:
             fine_tuning_datasets.all_intents
         )
 
-        BuildLogger.logger.info("train x shape: ", data.train_x.shape)
-        BuildLogger.logger.info("train x element example: ", data.train_x[0])
-        BuildLogger.logger.info("train y element example: ", data.train_y[0])
-        BuildLogger.logger.info("data max_length_sequence", data.max_sequence_length)
+        WoodgateLogger.logger.info("train x shape: ", data.train_x.shape)
+        WoodgateLogger.logger.info("train x element example: ", data.train_x[0])
+        WoodgateLogger.logger.info("train y element example: ", data.train_y[0])
+        WoodgateLogger.logger.info("data max_length_sequence", data.max_sequence_length)
 
-        BuildLogger.logger.info("Creating BERT model")
+        WoodgateLogger.logger.info("Creating BERT model")
         bert_model = model_definition.create_model(data.max_sequence_length, len(fine_tuning_datasets.all_intents))
 
         summary = ModelSummary.summarize(bert_model=bert_model)
-        BuildLogger.logger.info("BERT model Summary:\n", summary)
+        WoodgateLogger.logger.info("BERT model Summary:\n", summary)
 
-        BuildLogger.logger.info("Compiling BERT model")
+        WoodgateLogger.logger.info("Compiling BERT model")
         ModelCompiler.compile(bert_model=bert_model)
-        BuildLogger.logger.info("BERT model compilation complete")
+        WoodgateLogger.logger.info("BERT model compilation complete")
 
-        BuildLogger.logger.info("Initializing model fit")
+        WoodgateLogger.logger.info("Initializing model fit")
         model_fit = ModelFit(build_configuration=build_configuration)
 
-        BuildLogger.logger.info("Generating build history")
+        WoodgateLogger.logger.info("Generating build history")
         build_history = model_fit.fit(bert_model=bert_model, data=data)
 
-        BuildLogger.logger.info("Creating build history visuals:", build_configuration.create_build_visuals)
+        WoodgateLogger.logger.info("Creating build history visuals:", build_configuration.create_build_visuals)
         if build_configuration.create_build_visuals:
-            BuildLogger.logger.info("Initializing build summary")
+            WoodgateLogger.logger.info("Initializing build summary")
 
             build_summary = BuildSummary(build_configuration=build_configuration)
 
-            BuildLogger.logger.info("Creating plot of accuracy vs. epochs")
+            WoodgateLogger.logger.info("Creating plot of accuracy vs. epochs")
             accuracy_over_epochs_plot_created_successfully = False
             try:
                 build_summary.create_accuracy_over_epochs_plot(build_history=build_history)
                 accuracy_over_epochs_plot_created_successfully = True
             except OSError as err:
-                BuildLogger.logger.error(err)
+                WoodgateLogger.logger.error(err)
             finally:
-                BuildLogger.logger.error(
+                WoodgateLogger.logger.error(
                     "An unknown error occurred while creating accuracy over epochs plot from build history")
-            BuildLogger.logger.info(
+            WoodgateLogger.logger.info(
                 "Plot of accuracy vs. epochs created:", accuracy_over_epochs_plot_created_successfully)
 
-            BuildLogger.logger.info("Creating plot of loss vs. epochs")
+            WoodgateLogger.logger.info("Creating plot of loss vs. epochs")
             loss_over_epochs_plot_created_successfully = False
             try:
                 build_summary.create_loss_over_epochs_plot(build_history=build_history)
                 loss_over_epochs_plot_created_successfully = True
             except OSError as err:
-                BuildLogger.logger.error(err)
+                WoodgateLogger.logger.error(err)
             finally:
-                BuildLogger.logger.error(
+                WoodgateLogger.logger.error(
                     "An unknown error occurred while creating loss over epochs plot from build history")
-            BuildLogger.logger.info(
+            WoodgateLogger.logger.info(
                 "Plot of loss vs. epochs created:", loss_over_epochs_plot_created_successfully)
 
-        BuildLogger.logger.info("Initializing model evaluation")
+        WoodgateLogger.logger.info("Initializing model evaluation")
         model_evaluation = ModelEvaluation(
             build_configuration=build_configuration,
             model_definition=model_definition,
             fine_tuning_datasets=fine_tuning_datasets
         )
 
-        BuildLogger.logger.info("Evaluating model accuracy")
+        WoodgateLogger.logger.info("Evaluating model accuracy")
         model_evaluation.evaluate_model_accuracy(bert_model=bert_model, data=data)
-        BuildLogger.logger.info("Creating classification report")
+        WoodgateLogger.logger.info("Creating classification report")
         model_evaluation.create_classification_report(bert_model=bert_model, data=data)
-        BuildLogger.logger.info("Creating confusion matrix")
+        WoodgateLogger.logger.info("Creating confusion matrix")
         model_evaluation.create_confusion_matrix(bert_model=bert_model, data=data)
-        BuildLogger.logger.info("Performing regression testing")
+        WoodgateLogger.logger.info("Performing regression testing")
         model_evaluation.perform_regression_testing(bert_model=bert_model, data=data)
 
-        BuildLogger.logger.info("Initializing model storage strategy")
+        WoodgateLogger.logger.info("Initializing model storage strategy")
         model_storage_strategy = ModelStorageStrategy(build_configuration)
-        BuildLogger.logger.info("Saving model to disk")
+        WoodgateLogger.logger.info("Saving model to disk")
         model_storage_strategy.save_model_to_disk(bert_model=bert_model)
 
-        BuildLogger.logger.info("Initializing sanity check")
+        WoodgateLogger.logger.info("Initializing sanity check")
         build_sanity_check = BuildSanityCheck(model_storage_strategy=model_storage_strategy)
 
-        BuildLogger.logger.info("Checking build sanity")
+        WoodgateLogger.logger.info("Checking build sanity")
         build_sanity_check.check_sanity(data)
         build_duration = datetime.datetime.now() - start_time
-        BuildLogger.logger.info("Build process completed:", build_duration)
+        WoodgateLogger.logger.info("Build process completed:", build_duration)

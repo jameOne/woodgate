@@ -1,5 +1,5 @@
 """
-model_storage.py - The model_storage.py module contains the ModelStorage class which encapsulates logic related to
+model_storage_strategy.py - The model_storage_strategy.py module contains the ModelStorage class which encapsulates logic related to
 persisting the model after fine tuning.
 """
 from ..build.build_configuration import BuildConfiguration

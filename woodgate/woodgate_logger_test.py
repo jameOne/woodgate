@@ -1,6 +1,6 @@
 """
-build_logger_test.py - The build_logger_test.py module contains the unit tests related to the
-build_logger.py module.
+woodgate_logger_test.py - The woodgate_logger_test.py module contains the unit tests related to the
+woodgate_logger.py module.
 """
 import unittest
 
