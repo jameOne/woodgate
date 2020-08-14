@@ -78,25 +78,35 @@ class DatasetsConfiguration:
     #: (labelled fine_tuning_text_processor.data_column_title)
     #: , and one (1) for `label` i.e. the intent (labelled
     #: fine_tuning_text_processor.label_column_title)
-    training_data: pd.DataFrame
+    training_data: Union[pd.DataFrame, None] = None
 
     @classmethod
-    def set_training_data(cls):
-        """
+    def set_training_data(cls) -> None:
+        """This method will attempt to set the `training_data`
+        attribute by reading the file located on the host
+        file system at `$TRAINING_PATH` into a `pandas.DataFrame`.
+        It is assumed the file located at `$TRAINING_PATH` is in
+        CSV format and having a `.csv` file extension.
 
-        :return: this method returns None
+
+        :return: None
         :rtype: NoneType
         """
         cls.training_data = pd.read_csv(
             FileSystemConfiguration.training_path
         )
+
         return None
 
     @classmethod
-    def get_training_data(cls):
-        """
+    def get_training_data(cls) -> Union[pd.DataFrame, None]:
+        """This method is a simple getter which will return the
+        `training_data` attribute. Be sure to call the
+        `set_training_data` method or else the
+        `training_data` attribute will be undefined.
 
-        :return: this method returns the `training_data` attr.
+        :return: This method returns the `training_data`
+        attribute.
         :rtype: pd.DataFrame
         """
         return cls.training_data
@@ -108,10 +118,12 @@ class DatasetsConfiguration:
     #: with title "intent" in the `training_data`
     #: dataframe.
     @classmethod
-    def training_intents_list(cls):
-        """
+    def training_intents_list(cls) -> List[str]:
+        """This method calls the `get_training_data` method and
+        then extracts unique values from the "intent" column. The
+        resulting values are returned in a Python list.
 
-        :return: list of unique intents found in training data
+        :return: A list of unique intents found in training data.
         :rtype: List[str]
         """
         return cls.get_training_data().intent.unique().tolist()
@@ -123,10 +135,12 @@ class DatasetsConfiguration:
     #: with title "intent" in the `training_data`
     #: dataframe.
     @classmethod
-    def training_intents_set(cls):
-        """
+    def training_intents_set(cls) -> Set[str]:
+        """This method returns the result of
+        `training_intents_list` wrapped in a call to the build in
+        `set` function.
 
-        :return: set of intents from training data
+        :return: A set of intents from training data.
         :rtype: Set[str]
         """
         return set(cls.training_intents_list())
@@ -137,11 +151,14 @@ class DatasetsConfiguration:
     #: calling `training_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def training_intents_counts(cls):
-        """
+    def training_intents_counts(cls) -> pd.Series:
+        """This method gets the training data via the
+        `get_training_data` method and then returns the result of
+        calling the `pd.Series.value_counts` method on the series
+        representing intents.
 
-        :return:
-        :rtype:
+        :return: A value counts series.
+        :rtype: pd.Series
         """
         return cls.get_training_data().intent.value_counts()
 
@@ -154,13 +171,18 @@ class DatasetsConfiguration:
     #: (labelled fine_tuning_text_processor.data_column_title)
     #: , and one (1) for `label` i.e. the intent (labelled
     #: fine_tuning_text_processor.label_column_title)
-    testing_data: pd.DataFrame
+    testing_data: Union[pd.DataFrame, None] = None
 
     @classmethod
-    def set_testing_data(cls):
-        """
+    def set_testing_data(cls) -> None:
+        """This method will attempt to set the `testing_data`
+        attribute by reading the file located on the host
+        file system at `$TESTING_PATH` into a `pandas.DataFrame`.
+        It is assumed the file located at `$TESTING_PATH` is in
+        CSV format and having a `.csv` file extension.
 
-        :return: this method returns None
+
+        :return: None
         :rtype: NoneType
         """
         cls.testing_data = pd.read_csv(
@@ -169,10 +191,14 @@ class DatasetsConfiguration:
         return None
 
     @classmethod
-    def get_testing_data(cls):
-        """
+    def get_testing_data(cls) -> pd.DataFrame:
+        """This method is a simple getter which will return the
+        `testing_data` attribute. Be sure to call the
+        `set_testing_data` method or else the
+        `testing_data` attribute will be undefined.
 
-        :return: this method returns the `testing_data` attr.
+        :return: This method returns the `testing_data`
+        attribute.
         :rtype: pd.DataFrame
         """
         return cls.testing_data
@@ -184,10 +210,12 @@ class DatasetsConfiguration:
     #: with title "intent" in the `testing_data`
     #: dataframe.
     @classmethod
-    def testing_intents_list(cls):
-        """
+    def testing_intents_list(cls) -> List[str]:
+        """This method calls the `get_testing_data` method and
+        then extracts unique values from the "intent" column. The
+        resulting values are returned in a Python list.
 
-        :return:
+        :return: A list of unique intents found in testing data.
         :rtype: List[str]
         """
         return cls.get_testing_data().intent.unique().tolist()
@@ -199,10 +227,12 @@ class DatasetsConfiguration:
     #: with title "intent" in the `testing_data`
     #: dataframe.
     @classmethod
-    def testing_intents_set(cls):
-        """
+    def testing_intents_set(cls) -> Set[str]:
+        """This method returns the result of
+        `testing_intents_list` wrapped in a call to the build in
+        `set` function.
 
-        :return: set of intents from testing data
+        :return: A set of intents from testing data.
         :rtype: Set[str]
         """
         return set(cls.testing_intents_list())
@@ -213,11 +243,14 @@ class DatasetsConfiguration:
     #: calling `testing_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def testing_intents_counts(cls):
-        """
+    def testing_intents_counts(cls) -> pd.Series:
+        """This method gets the testing data via the
+        `get_testing_data` method and then returns the result of
+        calling the `pd.Series.value_counts` method on the series
+        representing intents.
 
-        :return:
-        :rtype:
+        :return: A value counts series.
+        :rtype: pd.Series
         """
         return cls.get_testing_data().intent.value_counts()
 
@@ -231,13 +264,19 @@ class DatasetsConfiguration:
     #: (labelled fine_tuning_text_processor.data_column_title)
     #: , and one (1) for `label` i.e. the intent (labelled
     #: fine_tuning_text_processor.label_column_title)
-    evaluation_data: pd.DataFrame
+    evaluation_data: Union[pd.DataFrame, None] = None
 
     @classmethod
     def set_evaluation_data(cls):
-        """
+        """This method will attempt to set the `testing_data`
+        attribute by reading the file located on the host
+        file system at `$EVALUATION_PATH` into a
+        `pandas.DataFrame`. It is assumed the file located at
+        `$EVALUATION_PATH` is in CSV format and having a `.csv`
+        file extension.
 
-        :return: this method returns None
+
+        :return: None
         :rtype: NoneType
         """
         cls.evaluation_data = pd.read_csv(
@@ -246,10 +285,14 @@ class DatasetsConfiguration:
         return None
 
     @classmethod
-    def get_evaluation_data(cls):
-        """
+    def get_evaluation_data(cls) -> pd.DataFrame:
+        """This method is a simple getter which will return the
+        `testing_data` attribute. Be sure to call the
+        `set_testing_data` method or else the
+        `testing_data` attribute will be undefined.
 
-        :return: this method returns the `evaluation_data` attr.
+        :return: This method returns the `testing_data`
+        attribute.
         :rtype: pd.DataFrame
         """
         return cls.evaluation_data
@@ -262,10 +305,12 @@ class DatasetsConfiguration:
     #: with title "intent" in the `evaluation_data`
     #: dataframe.
     @classmethod
-    def evaluation_intents_list(cls):
-        """
+    def evaluation_intents_list(cls) -> List[str]:
+        """This method calls the `get_testing_data` method and
+        then extracts unique values from the "intent" column. The
+        resulting values are returned in a Python list.
 
-        :return:
+        :return: A list of unique intents found in testing data.
         :rtype: List[str]
         """
         return cls.get_evaluation_data().intent.unique().tolist()
@@ -277,10 +322,12 @@ class DatasetsConfiguration:
     #: with title "intent" in the `evaluation_data`
     #: dataframe.
     @classmethod
-    def evaluation_intents_set(cls):
-        """
+    def evaluation_intents_set(cls) -> Set[str]:
+        """This method returns the result of
+        `evaluation_intents_list` wrapped in a call to the build
+        in `set` function.
 
-        :return: set of intents from evaluation data
+        :return: A set of intents from evaluation data.
         :rtype: Set[str]
         """
         return set(cls.evaluation_intents_list())
@@ -292,11 +339,14 @@ class DatasetsConfiguration:
     #: `testing_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def evaluation_intents_counts(cls):
-        """
+    def evaluation_intents_counts(cls) -> pd.Series:
+        """This method gets the testing data via the
+        `get_evaluation_data` method and then returns the result of
+        calling the `pd.Series.value_counts` method on the series
+        representing intents.
 
-        :return:
-        :rtype:
+        :return: A value counts series.
+        :rtype: pd.Series
         """
         return cls.get_evaluation_data().intent.value_counts()
 
@@ -310,13 +360,19 @@ class DatasetsConfiguration:
     #: (labelled fine_tuning_text_processor.data_column_title)
     #: , and one (1) for `label` i.e. the intent (labelled
     #: fine_tuning_text_processor.label_column_title)
-    regression_data: pd.DataFrame
+    regression_data: Union[pd.DataFrame, None] = None
 
     @classmethod
-    def set_regression_data(cls):
-        """
+    def set_regression_data(cls) -> None:
+        """This method will attempt to set the `regression_data`
+        attribute by reading the file located on the host
+        file system at `$REGRESSION_PATH` into a
+        `pandas.DataFrame`. It is assumed the file located at
+        `$REGRESSION_PATH` is in CSV format and having a `.csv`
+        file extension.
 
-        :return: this method returns None
+
+        :return: None
         :rtype: NoneType
         """
         cls.regression_data = pd.read_csv(
@@ -325,10 +381,14 @@ class DatasetsConfiguration:
         return None
 
     @classmethod
-    def get_regression_data(cls):
-        """
+    def get_regression_data(cls) -> pd.DataFrame:
+        """This method is a simple getter which will return the
+        `regression_data` attribute. Be sure to call the
+        `set_regression_data` method or else the
+        `regression_data` attribute will be undefined.
 
-        :return: this method returns the `regression_data` attr.
+        :return: This method returns the `regression_data`
+        attribute.
         :rtype: pd.DataFrame
         """
         return cls.regression_data
@@ -341,10 +401,13 @@ class DatasetsConfiguration:
     #: with title "intent" in the `regression_data`
     #: dataframe.
     @classmethod
-    def regression_intents_list(cls):
-        """
+    def regression_intents_list(cls) -> List[str]:
+        """This method calls the `get_regression_data` method and
+        then extracts unique values from the "intent" column. The
+        resulting values are returned in a Python list.
 
-        :return:
+        :return: A list of unique intents found in regression
+        data.
         :rtype: List[str]
         """
         return cls.get_regression_data().intent.unique().tolist()
@@ -356,10 +419,12 @@ class DatasetsConfiguration:
     #: with title "intent" in the `regression_data`
     #: dataframe.
     @classmethod
-    def regression_intents_set(cls):
-        """
+    def regression_intents_set(cls) -> Set[str]:
+        """This method returns the result of
+        `regression_intents_list` wrapped in a call to the build
+        in `set` function.
 
-        :return: set of intents from regression data
+        :return: A set of intents from regression data.
         :rtype: Set[str]
         """
         return set(cls.regression_intents_list())
@@ -371,11 +436,14 @@ class DatasetsConfiguration:
     #: `testing_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def regression_intents_counts(cls):
-        """
+    def regression_intents_counts(cls) -> pd.Series:
+        """This method gets the testing data via the
+        `get_evaluation_data` method and then returns the result
+        of calling the `pd.Series.value_counts` method on the
+        series representing intents.
 
-        :return:
-        :rtype:
+        :return: A value counts series.
+        :rtype: pd.Series
         """
         return cls.get_regression_data().intent.value_counts()
 
@@ -383,11 +451,15 @@ class DatasetsConfiguration:
     #: unique intents present in the training, testing,
     #: evaluation, and regression datasets.
     @classmethod
-    def all_intents(cls):
-        """
+    def all_intents(cls) -> List[str]:
+        """This method will call all `*_intents_list` methods and
+        compile them into a single list and then call the build in
+        `set` function on the list. The result is then converted
+        back into a list and returned.
 
-        :return:
-        :rtype:
+        :return: A list of unique intents found across all
+        datasets.
+        :rtype: List[str]
         """
         return list(
             set(
@@ -399,68 +471,70 @@ class DatasetsConfiguration:
         )
 
     @classmethod
-    def check_intents_intersection(cls):
-        """
+    def check_intents_intersection(cls) -> None:
+        """This method will perform a check on the intents found
+        across all datasets and throw errors if
 
         :return:
         :rtype:
         """
-        #: The `num_of_training_intents` attribute represents the
-        #: integer number of unique intents found in the
-        #: `training_data` dataset.
-        num_of_training_intents: int = \
-            len(cls.training_intents_list())
-
-        #: The `num_of_testing_intents` attribute represents the
-        #: integer number of unique intents found in the
-        #: `testing_data` dataset.
-        num_of_testing_intents: int = \
-            len(cls.testing_intents_list())
-
-        #: The `num_of_evaluation_intents` attribute represents
-        #: the integer number of unique intents found in the
-        #: `evaluation_data` dataset.
-        num_of_evaluation_intents: int = \
-            len(cls.evaluation_intents_list())
-
-        #: The `num_of_regression_intents` attribute represents
-        #: the integer number of unique intents found in the
-        #: `regression_data` dataset.
-        num_of_regression_intents: int = \
-            len(cls.regression_intents_list())
-
-        # It would be unusual for the set of testing intents to be
-        # unequal to the set of training intents.
-        if num_of_training_intents \
-                - num_of_testing_intents != 0:
-            WoodgateLogger.logger.warn(
-                "number of training intents "
-                + f"({num_of_training_intents}) "
-                + "not equal to number of testing intents "
-                + f"({num_of_testing_intents})"
-            )
-
-        # It would be unusual for the set of evaluation intents
-        # to be unequal to the set of training intents.
-        if num_of_training_intents \
-                - num_of_evaluation_intents != 0:
-            WoodgateLogger.logger.warn(
-                "number of training intents "
-                + f"({num_of_training_intents}) "
-                + "not equal to number of evaluation intents "
-                + f"({num_of_evaluation_intents})"
-            )
-
-        # It would be unusual for the set of regression intents
-        # to be unequal to the set of training intents.
-        if num_of_training_intents \
-                - num_of_regression_intents != 0:
-            WoodgateLogger.logger.warn(
-                "number of training intents "
-                + f"({num_of_regression_intents}) "
-                + "not equal to number of regression intents "
-                + f"({num_of_evaluation_intents})"
-            )
+        raise NotImplemented()
+        # #: The `num_of_training_intents` attribute represents the
+        # #: integer number of unique intents found in the
+        # #: `training_data` dataset.
+        # num_of_training_intents: int = \
+        #     len(cls.training_intents_list())
+        #
+        # #: The `num_of_testing_intents` attribute represents the
+        # #: integer number of unique intents found in the
+        # #: `testing_data` dataset.
+        # num_of_testing_intents: int = \
+        #     len(cls.testing_intents_list())
+        #
+        # #: The `num_of_evaluation_intents` attribute represents
+        # #: the integer number of unique intents found in the
+        # #: `evaluation_data` dataset.
+        # num_of_evaluation_intents: int = \
+        #     len(cls.evaluation_intents_list())
+        #
+        # #: The `num_of_regression_intents` attribute represents
+        # #: the integer number of unique intents found in the
+        # #: `regression_data` dataset.
+        # num_of_regression_intents: int = \
+        #     len(cls.regression_intents_list())
+        #
+        # # It would be unusual for the set of testing intents to be
+        # # unequal to the set of training intents.
+        # if num_of_training_intents \
+        #         - num_of_testing_intents != 0:
+        #     WoodgateLogger.logger.warn(
+        #         "number of training intents "
+        #         + f"({num_of_training_intents}) "
+        #         + "not equal to number of testing intents "
+        #         + f"({num_of_testing_intents})"
+        #     )
+        #
+        # # It would be unusual for the set of evaluation intents
+        # # to be unequal to the set of training intents.
+        # if num_of_training_intents \
+        #         - num_of_evaluation_intents != 0:
+        #     WoodgateLogger.logger.warn(
+        #         "number of training intents "
+        #         + f"({num_of_training_intents}) "
+        #         + "not equal to number of evaluation intents "
+        #         + f"({num_of_evaluation_intents})"
+        #     )
+        #
+        # # It would be unusual for the set of regression intents
+        # # to be unequal to the set of training intents.
+        # if num_of_training_intents \
+        #         - num_of_regression_intents != 0:
+        #     WoodgateLogger.logger.warn(
+        #         "number of training intents "
+        #         + f"({num_of_regression_intents}) "
+        #         + "not equal to number of regression intents "
+        #         + f"({num_of_evaluation_intents})"
+        #     )
 
     #: The `intents_data` attribute represents a Python
     #: dictionary containing key-value pairs of the type

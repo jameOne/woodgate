@@ -17,18 +17,29 @@ class SanityCheck:
     """
 
     @staticmethod
-    def check_sanity(data: TextProcessor):
-        """
+    def check_sanity(data: TextProcessor) -> None:
+        """This method will attempt to load a model from the
+        `$MODEL_BUILD_DIR` and re-run regression testing. Thus it
+        is expected this method is called after fine tuning BERT
+        and saving the resulting model to `$MODEL_BUILD_DIR`.
+        This test simply ensures the model saved to the file
+        system behaves identically to the model resulting from
+        fine tuning the BERT model (the one that was regression
+        tested while in memory).
 
-        :param data:
+        :param data: Accepts a `TextProcessor` object, where the
+        `TextProcessor` represents the processed textual data used
+        to train the machine learning model.
         :type data:
-        :return:
-        :rtype:
+        woodgate.fine_tuning.text_processor.TextProcessor
+        :return: None
+        :rtype: NoneType
         """
-        loaded_bert_model = keras.models.load_model(
-            FileSystemConfiguration.model_build_dir
-        )
         ModelEvaluation.perform_regression_testing(
-            loaded_bert_model,
+            keras.models.load_model(
+                FileSystemConfiguration.model_build_dir
+            ),
             data
         )
+
+        return None
