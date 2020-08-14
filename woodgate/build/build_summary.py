@@ -5,7 +5,7 @@ BuildSummary class definition.
 import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-from .build_configuration import BuildConfiguration
+from .file_system_configuration import FileSystemConfiguration
 
 
 class BuildSummary:
@@ -14,20 +14,8 @@ class BuildSummary:
     related to summarizing the model build.
     """
 
-    def __init__(
-            self,
-            build_configuration: BuildConfiguration
-    ):
-        """
-
-        :param build_configuration:
-        """
-        self.output_dir = build_configuration.output_dir
-
-    def create_loss_over_epochs_plot(
-            self,
-            build_history
-    ):
+    @staticmethod
+    def create_loss_over_epochs_plot(build_history):
         """
 
         :param build_history:
@@ -46,17 +34,15 @@ class BuildSummary:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                self.output_dir,
+                FileSystemConfiguration.output_dir,
                 "training_summary",
                 "loss_over_epochs.png"
             )
         )
         plt.figure().clear()
 
-    def create_accuracy_over_epochs_plot(
-            self,
-            build_history
-    ):
+    @staticmethod
+    def create_accuracy_over_epochs_plot(build_history):
         """
         
         :param build_history: 
@@ -77,7 +63,7 @@ class BuildSummary:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                self.output_dir,
+                FileSystemConfiguration.output_dir,
                 "training_summary",
                 "accuracy_over_epochs.png"
             )

@@ -1,6 +1,6 @@
 """
-fine_tuning_text_processor_test.py - Module - The fine_tuning_text_processor_test.py module contains all unit tests related to
-the fine_tuning_text_processor.py module.
+datasets_configuration_test.py - Module - The datasets_configuration_test.py module contains all unit tests related to
+the datasets_configuration.py module.
 """
 import unittest
 

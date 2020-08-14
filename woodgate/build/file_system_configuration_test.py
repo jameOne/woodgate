@@ -1,6 +1,7 @@
 """
-build_configuration_test.py - Module - The build_configuration_test.py module contains all unit tests related to
-the build_configuration.py module.
+file_system_configuration_test.py - Module -
+The file_system_configuration_test.py module contains all unit tests
+related to the file_system_configuration.py module.
 """
 import unittest
 

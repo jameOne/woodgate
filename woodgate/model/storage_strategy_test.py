@@ -1,6 +1,7 @@
 """
-model_fit_test.py - Module - The model_fit_test.py module contains all unit tests related to
-the model_fit.py module.
+storage_strategy_test.py - The storage_strategy_test.py module
+contains unit tests related to the woodgate.model.storage_strategy
+module.
 """
 import unittest
 

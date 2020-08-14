@@ -1,7 +1,6 @@
 """
-build_summary_test.py - The build_summary_test.py module
-contains all unit tests related to the
-woodgate.build.build_summary module.
+fitter_test.py - The fitter_test.py module contains all
+unit tests related to the woodgate.model.fitter module.
 """
 import unittest
 

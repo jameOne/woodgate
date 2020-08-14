@@ -10,37 +10,42 @@ Welcome to Woodgate's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: woodgate.build.build_configuration
+
+.. automodule:: woodgate.woodgate_logger
     :members:
 
-.. automodule:: woodgate.build.build_logger
-    :members:
 
-.. automodule:: woodgate.build.build_sanity_check
+.. automodule:: woodgate.woodgate_process
     :members:
 
 .. automodule:: woodgate.build.build_summary
     :members:
 
-.. automodule:: woodgate.fine_tuning.fine_tuning_datasets
+.. automodule:: woodgate.build.file_system_configuration
     :members:
 
-.. automodule:: woodgate.fine_tuning.fine_tuning_text_processor
+.. automodule:: woodgate.build.sanity_check
     :members:
 
-.. automodule:: woodgate.model.model_compiler
+.. automodule:: woodgate.fine_tuning.datasets_configuration
     :members:
 
-.. automodule:: woodgate.model.model_definition
+.. automodule:: woodgate.fine_tuning.text_processor
     :members:
 
-.. automodule:: woodgate.model.model_evaluation
+.. automodule:: woodgate.model.compiler
     :members:
 
-.. automodule:: woodgate.model.model_fit
+.. automodule:: woodgate.model.definition
     :members:
 
-.. automodule:: woodgate.model.model_storage
+.. automodule:: woodgate.model.evaluation
+    :members:
+
+.. automodule:: woodgate.model.fitter
+    :members:
+
+.. automodule:: woodgate.model.storage_strategy
     :members:
 
 .. automodule:: woodgate.model.model_summary

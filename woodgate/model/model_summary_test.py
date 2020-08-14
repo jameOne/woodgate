@@ -1,6 +1,6 @@
 """
-model_definition_test.py - Module - The model_definition_test.py module contains all unit tests related to
-the model_definition.py module.
+build_summary_test.py - The build_summary_test.py module contains unite tests
+related to the woodgate.model.summary module.
 """
 import unittest
 

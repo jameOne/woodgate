@@ -1,3 +1,7 @@
+"""
+definition_test.py - Module - The definition_test.py module contains all unit tests related to
+the definition.py module.
+"""
 import unittest
 
 

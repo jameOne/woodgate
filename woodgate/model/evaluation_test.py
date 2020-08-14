@@ -1,5 +1,6 @@
 """
-
+evaluation_test.py - The evaluation_test.py module
+contains all unit tests related to the evaluation.py module.
 """
 import unittest
 
