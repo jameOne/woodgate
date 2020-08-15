@@ -5,7 +5,7 @@ contains the DatasetsConfiguration class definition.
 """
 import os
 import json
-from typing import List, Set, Dict, Union, NoReturn
+from typing import List, Set, Dict, Union
 import pandas as pd
 from ..build.file_system_configuration import \
     FileSystemConfiguration
@@ -469,12 +469,14 @@ class ExternalDatasets:
         datasets.
         :rtype: List[str]
         """
-        return list(
-            set(
-                cls.training_intents_list()
-                + cls.testing_intents_list()
-                + cls.evaluation_intents_list()
-                + cls.regression_intents_list()
+        return sorted(
+            list(
+                set(
+                    cls.training_intents_list()
+                    + cls.testing_intents_list()
+                    + cls.evaluation_intents_list()
+                    + cls.regression_intents_list()
+                )
             )
         )
 
@@ -536,7 +538,7 @@ class ExternalDatasets:
     #: intent lists or intent count lists respectively.
     @classmethod
     def intents_dict(cls) -> Dict[
-        str, Union[List[str], List[int]]
+        str, Union[List[str], pd.Series]
     ]:
         """This method will return a Python dictionary containing
         the intents data found across all datasets.
@@ -548,20 +550,24 @@ class ExternalDatasets:
         return {
             "intents": cls.all_intents(),
             "training_set": {
-                "intent": cls.training_intents_list(),
-                "count": cls.training_intents_counts()
+                "intents": cls.training_intents_list(),
+                "counts": cls.training_intents_counts().to_json(
+                )
             },
             "testing_set": {
-                "intent": cls.testing_intents_list(),
-                "count": cls.testing_intents_counts()
+                "intents": cls.testing_intents_list(),
+                "counts": cls.testing_intents_counts().to_json(
+                )
             },
             "evaluation_set": {
-                "intent": cls.evaluation_intents_list(),
-                "count": cls.evaluation_intents_list()
+                "intents": cls.evaluation_intents_list(),
+                "counts": cls.evaluation_intents_counts().to_json(
+                )
             },
             "regression_set": {
-                "intent": cls.regression_intents_list(),
-                "count": cls.regression_intents_counts()
+                "intents": cls.regression_intents_list(),
+                "counts": cls.regression_intents_counts().to_json(
+                )
             }
         }
 
@@ -584,7 +590,7 @@ class ExternalDatasets:
             FileSystemConfiguration.datasets_summary_dir,
             "intentsData.json"
         )
-        with open(intents_data_json) as file:
+        with open(intents_data_json, "w+") as file:
             file.write(
                 json.dumps(cls.intents_dict())
             )
