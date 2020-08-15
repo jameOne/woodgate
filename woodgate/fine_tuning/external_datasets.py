@@ -105,7 +105,7 @@ class ExternalDatasets:
         `set_training_data` method or else the
         `training_data` attribute will be undefined.
 
-        :return: This method returns the `training_data`
+        :return: This method returns the `training_data` \
         attribute.
         :rtype: pd.DataFrame
         """
@@ -199,7 +199,7 @@ class ExternalDatasets:
         `set_testing_data` method or else the
         `testing_data` attribute will be undefined.
 
-        :return: This method returns the `testing_data`
+        :return: This method returns the `testing_data` \
         attribute.
         :rtype: pd.DataFrame
         """
@@ -295,7 +295,7 @@ class ExternalDatasets:
         `set_testing_data` method or else the
         `testing_data` attribute will be undefined.
 
-        :return: This method returns the `testing_data`
+        :return: This method returns the `testing_data` \
         attribute.
         :rtype: pd.DataFrame
         """
@@ -393,7 +393,7 @@ class ExternalDatasets:
         `set_regression_data` method or else the
         `regression_data` attribute will be undefined.
 
-        :return: This method returns the `regression_data`
+        :return: This method returns the `regression_data` \
         attribute.
         :rtype: pd.DataFrame
         """
@@ -412,7 +412,7 @@ class ExternalDatasets:
         then extracts unique values from the "intent" column. The
         resulting values are returned in a sorted Python list.
 
-        :return: A list of unique intents found in regression
+        :return: A list of unique intents found in regression \
         data.
         :rtype: List[str]
         """
@@ -465,7 +465,7 @@ class ExternalDatasets:
         `set` function on the list. The result is then converted
         back into a list and returned.
 
-        :return: A list of unique intents found across all
+        :return: A list of unique intents found across all \
         datasets.
         :rtype: List[str]
         """
@@ -541,7 +541,7 @@ class ExternalDatasets:
         """This method will return a Python dictionary containing
         the intents data found across all datasets.
 
-        :return:  A dictionary representing each dataset and
+        :return:  A dictionary representing each dataset and \
         their respective intents and intent counts.
         :rtype: Dict[str, Union[List[str], List[int]]]
         """

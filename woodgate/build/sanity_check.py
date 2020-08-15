@@ -27,11 +27,10 @@ class SanityCheck:
         fine tuning the BERT model (the one that was regression
         tested while in memory).
 
-        :param data: Accepts a `TextProcessor` object, where the
-        `TextProcessor` represents the processed textual data used
-        to train the machine learning model.
-        :type data:
-        woodgate.fine_tuning.text_processor.TextProcessor
+        :param data: Accepts a `TextProcessor` object, where the \
+        `TextProcessor` represents the processed textual data \
+        used to train the machine learning model.
+        :type data: TextProcessor
         :return: None
         :rtype: NoneType
         """

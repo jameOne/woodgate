@@ -27,13 +27,15 @@ class Compiler:
     def compile(bert_model: keras.Model) -> keras.Model:
         # TODO - Open a number of options for loss, optimizer, and
         #   metrics.
-        """
+        """This method will call the `compile` method on the
+        `keras.Model` setting the optimizer, the loss function and
+        the metrics.
 
-        :param bert_model: The BERT transfer model gathered from
+        :param bert_model: The BERT transfer model gathered from \
         Google.
         :type bert_model: keras.Model
-        :return: A BERT model compiled from the transfer model
-        (having optimizer, loss function, and metrics set) ready
+        :return: A BERT model compiled from the transfer model \
+        (having optimizer, loss function, and metrics set) ready \
         for training.
         :rtype: keras.Model
         """

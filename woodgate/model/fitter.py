@@ -84,21 +84,22 @@ class Fitter:
             cls,
             bert_model: keras.Model,
             data: TextProcessor
-    ) -> Any:
+    ) -> object:
         """This method wraps the `fit` method of the `keras.Model`
         object argument which returns an object representing the
-        history of thed build.
+        history of the build.
         
-        :param bert_model: The application specific (trained) BERT
-        model.
+        :param bert_model: The application specific (trained) \
+        BERT model.
         :type bert_model: keras.Model
         :param data: Processed textual data.
         :type data: TextProcessor
-        :return: A `History` object. Its `History.history`
-        attribute is a record of training loss values and metrics
-        values at successive epochs, as well as validation loss
-        values and validation metrics values (if applicable).
-        :rtype: Any
+        :return: A `History` object. Its `History.history` \
+        attribute is a record of training loss values and \
+        metrics values at successive epochs, as well as \
+        validation loss values and validation metrics values \
+        (if applicable).
+        :rtype: object
         """
         
         callbacks = list()

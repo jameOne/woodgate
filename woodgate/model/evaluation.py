@@ -37,12 +37,12 @@ class ModelEvaluation:
         """This method wraps calls which evaluate the model on the
         provided data.
 
-        :param bert_model: The application specific (trained) BERT
-        model.
+        :param bert_model: The application specific (trained) \
+        BERT model.
         :type bert_model: keras.Model
         :param data: Processed textual data.
         :type data: TextProcessor
-        :return: A tuple of the training accuracy, and testing
+        :return: A tuple of the training accuracy, and testing \
         accuracy respectively.
         :rtype: Tuple[Any, Any]
         """
@@ -65,8 +65,8 @@ class ModelEvaluation:
         """This method generates a report describing on the
         model's ability to classify the textual data.
 
-        :param bert_model: The application specific (trained) BERT
-        model.
+        :param bert_model: The application specific (trained) \
+        BERT model.
         :type bert_model: keras.Model
         :param data: Processed textual data.
         :type data: TextProcessor
@@ -90,8 +90,8 @@ class ModelEvaluation:
         """This model will generate a confusion matrix from the
         trained model and processed textual data.
 
-        :param bert_model: The application specific (trained) BERT
-        model.
+        :param bert_model: The application specific (trained) \
+        BERT model.
         :type bert_model: keras.Model
         :param data: Processed textual data.
         :type data: TextProcessor
@@ -152,8 +152,8 @@ class ModelEvaluation:
         representation of the model's accuracy over the complete
         build history.
 
-        :param bert_model: The application specific (trained) BERT
-        model.
+        :param bert_model: The application specific (trained) \
+        BERT model.
         :type bert_model: keras.Model
         :param data: Processed textual data.
         :type data: TextProcessor

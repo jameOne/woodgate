@@ -26,11 +26,11 @@ class BuildSummary:
         `$OUTPUT_DIR/build_summary/loss_over_epochs.png` on
         host file system.
 
-        :param build_history: Accepts a History object, where the
-        History object is the return type of calling the `fit`
-        method on `tf.keras.Model` objects.
-        :type build_history: tf.keras.callbacks.History
-        :return: this method returns None
+        :param build_history: Accepts a History object, where \
+        the History object is the return type of calling the \
+        `fit` method on `tf.keras.Model` objects.
+        :type build_history: object
+        :return: None
         :rtype: NoneType
         """
 
@@ -66,11 +66,11 @@ class BuildSummary:
         `$OUTPUT_DIR/build_summary/accuracy_over_epochs.png` on
         host file system.
         
-        :param build_history: Accepts a `History` object, where
-        the `History` object is the return type of calling the
-        `fit` method on `tf.keras.Model` objects.
-        :type build_history: tf.keras.callbacks.History
-        :return: this method returns None
+        :param build_history: Accepts a `History` object, where \
+        the `History` object is the return type of calling the \
+        `fit` method on `keras.Model` objects.
+        :type build_history: object
+        :return: None
         :rtype: NoneType
         """
 
