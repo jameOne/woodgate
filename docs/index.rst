@@ -27,7 +27,7 @@ Welcome to Woodgate's documentation!
 .. automodule:: woodgate.build.sanity_check
     :members:
 
-.. automodule:: woodgate.fine_tuning.datasets_configuration
+.. automodule:: woodgate.fine_tuning.external_datasets
     :members:
 
 .. automodule:: woodgate.fine_tuning.text_processor
