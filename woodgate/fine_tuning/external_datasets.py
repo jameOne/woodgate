@@ -1,11 +1,11 @@
 """
-datasets_configuration.py - The
-datasets_configuration.py module
+external_datasets.py - The
+external_datasets.py module
 contains the DatasetsConfiguration class definition.
 """
 import os
 import json
-from typing import List, Set, Dict, Union
+from typing import List, Set, Dict, Union, NoReturn
 import pandas as pd
 from ..build.file_system_configuration import \
     FileSystemConfiguration
@@ -14,10 +14,10 @@ import matplotlib.pyplot as plt
 from ..woodgate_logger import WoodgateLogger
 
 
-class DatasetsConfiguration:
+class ExternalDatasets:
     """
-    Datasets - The Dataset class encapsulates logic
-    related to training, testing, evaluation, and regression
+    ExternalDatasets - The ExternalDataset class encapsulates
+    logic related to training, testing, evaluation, and regression
     datasets.
     """
 
@@ -121,12 +121,14 @@ class DatasetsConfiguration:
     def training_intents_list(cls) -> List[str]:
         """This method calls the `get_training_data` method and
         then extracts unique values from the "intent" column. The
-        resulting values are returned in a Python list.
+        resulting values are returned in a sorted Python list.
 
         :return: A list of unique intents found in training data.
         :rtype: List[str]
         """
-        return cls.get_training_data().intent.unique().tolist()
+        return sorted(
+            cls.get_training_data().intent.unique().tolist()
+        )
 
     #: The `training_set` attribute represents a set
     #: of unique intents found in the `training_data`.
@@ -213,12 +215,14 @@ class DatasetsConfiguration:
     def testing_intents_list(cls) -> List[str]:
         """This method calls the `get_testing_data` method and
         then extracts unique values from the "intent" column. The
-        resulting values are returned in a Python list.
+        resulting values are returned in a sorted Python list.
 
         :return: A list of unique intents found in testing data.
         :rtype: List[str]
         """
-        return cls.get_testing_data().intent.unique().tolist()
+        return sorted(
+            cls.get_testing_data().intent.unique().tolist()
+        )
 
     #: The `testing_set` attribute represents a set
     #: of unique intents found in the `testing_data`.
@@ -308,12 +312,14 @@ class DatasetsConfiguration:
     def evaluation_intents_list(cls) -> List[str]:
         """This method calls the `get_testing_data` method and
         then extracts unique values from the "intent" column. The
-        resulting values are returned in a Python list.
+        resulting values are returned in a sorted Python list.
 
         :return: A list of unique intents found in testing data.
         :rtype: List[str]
         """
-        return cls.get_evaluation_data().intent.unique().tolist()
+        return sorted(
+            cls.get_evaluation_data().intent.unique().tolist()
+        )
 
     #: The `evaluation_set` attribute represents a set
     #: of unique intents found in the `evaluation_data`.
@@ -341,9 +347,9 @@ class DatasetsConfiguration:
     @classmethod
     def evaluation_intents_counts(cls) -> pd.Series:
         """This method gets the testing data via the
-        `get_evaluation_data` method and then returns the result of
-        calling the `pd.Series.value_counts` method on the series
-        representing intents.
+        `get_evaluation_data` method and then returns the result
+        of calling the `pd.Series.value_counts` method on the
+        series representing intents.
 
         :return: A value counts series.
         :rtype: pd.Series
@@ -404,13 +410,15 @@ class DatasetsConfiguration:
     def regression_intents_list(cls) -> List[str]:
         """This method calls the `get_regression_data` method and
         then extracts unique values from the "intent" column. The
-        resulting values are returned in a Python list.
+        resulting values are returned in a sorted Python list.
 
         :return: A list of unique intents found in regression
         data.
         :rtype: List[str]
         """
-        return cls.get_regression_data().intent.unique().tolist()
+        return sorted(
+            cls.get_regression_data().intent.unique().tolist()
+        )
 
     #: The `regression_set` attribute represents a set
     #: of unique intents found in the `regression_data`.
@@ -471,80 +479,70 @@ class DatasetsConfiguration:
         )
 
     @classmethod
-    def check_intents_intersection(cls) -> None:
+    def assert_intents_intersect(cls) -> None:
         """This method will perform a check on the intents found
-        across all datasets and throw errors if
+        across all datasets and throws a ValueError if the sorted
+        testing, evaluation, or regression intent sets do not
+        completely intersect i.e. are equal sets.
 
-        :return:
-        :rtype:
+        :return: None
+        :rtype: NoneType
         """
-        raise NotImplemented()
-        # #: The `num_of_training_intents` attribute represents the
-        # #: integer number of unique intents found in the
-        # #: `training_data` dataset.
-        # num_of_training_intents: int = \
-        #     len(cls.training_intents_list())
-        #
-        # #: The `num_of_testing_intents` attribute represents the
-        # #: integer number of unique intents found in the
-        # #: `testing_data` dataset.
-        # num_of_testing_intents: int = \
-        #     len(cls.testing_intents_list())
-        #
-        # #: The `num_of_evaluation_intents` attribute represents
-        # #: the integer number of unique intents found in the
-        # #: `evaluation_data` dataset.
-        # num_of_evaluation_intents: int = \
-        #     len(cls.evaluation_intents_list())
-        #
-        # #: The `num_of_regression_intents` attribute represents
-        # #: the integer number of unique intents found in the
-        # #: `regression_data` dataset.
-        # num_of_regression_intents: int = \
-        #     len(cls.regression_intents_list())
-        #
-        # # It would be unusual for the set of testing intents to be
-        # # unequal to the set of training intents.
-        # if num_of_training_intents \
-        #         - num_of_testing_intents != 0:
-        #     WoodgateLogger.logger.warn(
-        #         "number of training intents "
-        #         + f"({num_of_training_intents}) "
-        #         + "not equal to number of testing intents "
-        #         + f"({num_of_testing_intents})"
-        #     )
-        #
-        # # It would be unusual for the set of evaluation intents
-        # # to be unequal to the set of training intents.
-        # if num_of_training_intents \
-        #         - num_of_evaluation_intents != 0:
-        #     WoodgateLogger.logger.warn(
-        #         "number of training intents "
-        #         + f"({num_of_training_intents}) "
-        #         + "not equal to number of evaluation intents "
-        #         + f"({num_of_evaluation_intents})"
-        #     )
-        #
-        # # It would be unusual for the set of regression intents
-        # # to be unequal to the set of training intents.
-        # if num_of_training_intents \
-        #         - num_of_regression_intents != 0:
-        #     WoodgateLogger.logger.warn(
-        #         "number of training intents "
-        #         + f"({num_of_regression_intents}) "
-        #         + "not equal to number of regression intents "
-        #         + f"({num_of_evaluation_intents})"
-        #     )
+
+        # It would be unusual for the set of testing intents to be
+        # unequal to the set of training intents.
+        if cls.training_intents_list() \
+                != cls.testing_intents_list():
+            WoodgateLogger.logger.warn(
+                "training intents not equal to number of "
+                + "testing intents"
+            )
+            raise ValueError(
+                "training intents and "
+                + "testing intents do not intersect"
+            )
+
+        # It would be unusual for the set of evaluation intents
+        # to be unequal to the set of training intents.
+        if cls.training_intents_list() \
+                != cls.evaluation_intents_list():
+            WoodgateLogger.logger.warn(
+                "training intents not equal to number of "
+                + "evaluation intents"
+            )
+            raise ValueError(
+                "training intents and "
+                + "evaluation intents do not intersect"
+            )
+
+        # It would be unusual for the set of regression intents
+        # to be unequal to the set of training intents.
+        if cls.training_intents_list() \
+                != cls.regression_intents_list():
+            WoodgateLogger.logger.warn(
+                "training intents not equal to number of "
+                + "regression intents"
+            )
+            raise ValueError(
+                "training intents and "
+                + "regression intents do not intersect"
+            )
+
+        return None
 
     #: The `intents_data` attribute represents a Python
     #: dictionary containing key-value pairs of the type
     #: str-List[str] or str-List[int]. These items are
     #: intent lists or intent count lists respectively.
     @classmethod
-    def intents_dict(cls):
-        """
+    def intents_dict(cls) -> Dict[
+        str, Union[List[str], List[int]]
+    ]:
+        """This method will return a Python dictionary containing
+        the intents data found across all datasets.
 
-        :return:
+        :return:  A dictionary representing each dataset and
+        their respective intents and intent counts.
         :rtype: Dict[str, Union[List[str], List[int]]]
         """
         return {
@@ -567,36 +565,23 @@ class DatasetsConfiguration:
             }
         }
 
-    #: The `datasets_summary_dir` attribute represents a
-    #: directory on the host's file system. This is where the
-    #: summary files generated by the `create_*` methods
-    #: are stored.
-    datasets_summary_dir: str = os.getenv(
-        "DATASET_SUMMARY_DIR",
-        os.path.join(
-            FileSystemConfiguration.build_dir,
-            "datasets_summary"
-        )
-    )
-    os.makedirs(datasets_summary_dir, exist_ok=True)
-
     @classmethod
-    def create_data_json(cls):
+    def create_data_json(cls) -> None:
         """This method will create one (1) file containing data
         which describes the distribution of intents across fine
         tuning datasets. The file will be stored in the
-        `cls.datasets_summary_dir` directory in
-        JSON format with `.json` file extension.
+        `FileSystemConfiguration.datasets_summary_dir` directory
+        in JSON format with `.json` file extension.
 
         1 - Intents Data
                 * `intentsData.json`
 
 
-        :return: This method returns None
+        :return: None
         :rtype: NoneType
         """
         intents_data_json = os.path.join(
-            cls.datasets_summary_dir,
+            FileSystemConfiguration.datasets_summary_dir,
             "intentsData.json"
         )
         with open(intents_data_json) as file:
@@ -607,11 +592,11 @@ class DatasetsConfiguration:
         return None
 
     @classmethod
-    def create_bar_plots(cls):
+    def create_bar_plots(cls) -> None:
         """The method will create four (4) bar plots describing
         the distribution of intents across the four (4) fine
         tuning datasets. The plots will be stored in the
-        `cls.datasets_summary_dir` directory
+        `FileSystemConfiguration.datasets_summary_dir` directory
         as PNG files with `.png` file extensions.
 
         1 - Training Intents
@@ -623,7 +608,7 @@ class DatasetsConfiguration:
         4 - Regression Intents
                 * `intents_bar_plot_regression.png`
 
-        :return: This method returns None
+        :return: None
         :rtype: NoneType
         """
 
@@ -637,7 +622,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_bar_plot_training.png"
             )
         )
@@ -653,7 +638,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_bar_plot_testing.png"
             )
         )
@@ -669,7 +654,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_bar_plot_evaluation.png"
             )
         )
@@ -685,7 +670,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_bar_plot_regression.png"
             )
         )
@@ -697,7 +682,8 @@ class DatasetsConfiguration:
     def create_venn_diagrams(cls):
         """The method will create six (6) Venn diagrams describing
         two (2) sets and their intersections. The diagrams will be
-        stored in the `cls.datasets_summary_dir`
+        stored in the
+        `FileSystemConfiguration.datasets_summary_dir`
         directory as PNG files with `.png` file extensions.
 
         1 - Training and Evaluation
@@ -713,7 +699,7 @@ class DatasetsConfiguration:
         6 - Testing and Regression
                 * `intents_venn_testing_regression.png`
 
-        :return: This method returns None
+        :return: None
         :rtype: NoneType
         """
         plt_title = "Datasets - Intents Venn Diagram - "
@@ -731,7 +717,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_venn_training_evaluation.png"
             )
         )
@@ -750,7 +736,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_venn_training_testing.png"
             )
         )
@@ -769,7 +755,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_venn_training_regression.png"
             )
         )
@@ -788,7 +774,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_venn_evaluation_testing.png"
             )
         )
@@ -807,7 +793,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_venn_evaluation_regression.png"
             )
         )
@@ -826,7 +812,7 @@ class DatasetsConfiguration:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                cls.datasets_summary_dir,
+                FileSystemConfiguration.datasets_summary_dir,
                 "intents_venn_testing_regression.png"
             )
         )

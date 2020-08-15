@@ -2,7 +2,6 @@
 definition.py - This file contains the Definition class which
 encapsulates logic related to defining the model layers.
 """
-import os
 from bert.loader import (
     StockBertConfig,
     map_stock_config_to_params,
@@ -22,54 +21,22 @@ class Definition:
     related to defining the model architecture.
     """
 
-    #: The `bert_dir` attribute represents the path to a
-    #: directory on the host file system containing the BERT
-    #: model. This attribute is set via the `BERT_DIR`
-    #: environment variable. If the `BERT_DIR` environment
-    #: variable is not set, then the `bert_dir` attribute
-    #: defaults to `$WOODGATE_BASE_DIR/bert`. The program will
-    #: attempt to create `BERT_DIR` if it does not already
-    #: exist.
-    bert_dir: str = os.getenv(
-        "BERT_DIR",
-        os.path.join(
-            FileSystemConfiguration.woodgate_base_dir,
-            "bert"
-        )
-    )
-    os.makedirs(bert_dir, exist_ok=True)
+    @staticmethod
+    def get_tokenizer() -> FullTokenizer:
+        """This method will return a BERT tokenizer initialized
+        using the vocabulary file at
+        `FileSystemConfiguration.bert_vocab_path`.
 
-    bert_config: str = os.getenv(
-        "BERT_CONFIG",
-        os.path.join(
-            bert_dir,
-            "bert_config.json"
-        )
-    )
-
-    bert_model: str = os.getenv(
-        "BERT_MODEL",
-        os.path.join(
-            bert_dir,
-            "bert_model.ckpt"
-        )
-    )
-
-    @classmethod
-    def get_tokenizer(cls):
-        """
-
-        :return:
-        :rtype:
+        :return: A BERT tokenizer.
+        :rtype: FullTokenizer
         """
         tokenizer: FullTokenizer = FullTokenizer(
-            vocab_file=os.path.join(cls.bert_dir, "vocab.txt")
+            vocab_file=FileSystemConfiguration.bert_vocab_path
         )
         return tokenizer
 
-    @classmethod
+    @staticmethod
     def create_model(
-            cls,
             max_sequence_length: int,
             number_of_intents: int
     ):
@@ -87,7 +54,9 @@ class Definition:
         :rtype: keras.Model
         """
 
-        with tf.io.gfile.GFile(cls.bert_config) as reader:
+        with tf.io.gfile.GFile(
+                FileSystemConfiguration.bert_config_path
+        ) as reader:
             bc = StockBertConfig.from_json_string(reader.read())
             bert_params = map_stock_config_to_params(bc)
             bert_params.adapter_size = None
@@ -116,6 +85,9 @@ class Definition:
             inputs=input_ids, outputs=logits)
         model.build(input_shape=(None, max_sequence_length))
 
-        load_stock_weights(bert, cls.bert_model)
+        load_stock_weights(
+            bert,
+            FileSystemConfiguration.bert_model_path
+        )
 
         return model

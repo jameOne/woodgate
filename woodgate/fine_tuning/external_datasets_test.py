@@ -1,6 +1,6 @@
 """
-datasets_configuration_test.py - Module - The datasets_configuration_test.py module contains all unit tests related to
-the datasets_configuration.py module.
+external_datasets_test.py - Module - The external_datasets_test.py module contains all unit tests related to
+the external_datasets.py module.
 """
 import unittest
 

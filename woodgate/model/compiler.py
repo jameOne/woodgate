@@ -12,6 +12,11 @@ class Compiler:
     compiling the model.
     """
 
+    #: The `learning_rate` attribute represents a floating point
+    #: value which represents the step size taken by the
+    #: optimization algorithm toward a minimum loss. This value
+    #: should be in the interval (0-1], otherwise a ValueError
+    #: will be thrown at run time.
     learning_rate = float(os.getenv("LEARNING_RATE", "1e-5"))
     if learning_rate <= 0 or learning_rate > 1:
         raise ValueError(
@@ -19,13 +24,18 @@ class Compiler:
             "must be an integer value between (0-1]")
 
     @staticmethod
-    def compile(bert_model: keras.Model):
+    def compile(bert_model: keras.Model) -> keras.Model:
+        # TODO - Open a number of options for loss, optimizer, and
+        #   metrics.
         """
 
-        :param bert_model:
-        :type bert_model:
-        :return:
-        :rtype:
+        :param bert_model: The BERT transfer model gathered from
+        Google.
+        :type bert_model: keras.Model
+        :return: A BERT model compiled from the transfer model
+        (having optimizer, loss function, and metrics set) ready
+        for training.
+        :rtype: keras.Model
         """
         compiled_model: keras.Model = bert_model.compile(
             optimizer=keras.optimizers.Adam(
@@ -40,4 +50,5 @@ class Compiler:
                 )
             ]
         )
+
         return compiled_model

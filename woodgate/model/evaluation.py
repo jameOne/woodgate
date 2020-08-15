@@ -11,11 +11,12 @@ from sklearn.metrics import (
 import pandas as pd
 import seaborn as sns
 import numpy as np
+from typing import Tuple, Any, Dict
 import matplotlib.pyplot as plt
 from tensorflow import keras
 
-from ..fine_tuning.datasets_configuration import \
-    DatasetsConfiguration
+from ..fine_tuning.external_datasets import \
+    ExternalDatasets
 from ..model.definition import Definition
 from ..fine_tuning.text_processor import TextProcessor
 from ..build.file_system_configuration import \
@@ -32,12 +33,18 @@ class ModelEvaluation:
     def evaluate_model_accuracy(
             bert_model: keras.Model,
             data: TextProcessor
-    ):
-        """
+    ) -> Tuple[Any, Any]:
+        """This method wraps calls which evaluate the model on the
+        provided data.
 
-        :param bert_model:
-        :param data:
-        :return:
+        :param bert_model: The application specific (trained) BERT
+        model.
+        :type bert_model: keras.Model
+        :param data: Processed textual data.
+        :type data: TextProcessor
+        :return: A tuple of the training accuracy, and testing
+        accuracy respectively.
+        :rtype: Tuple[Any, Any]
         """
         _, train_acc = bert_model.evaluate(
             data.train_x,
@@ -48,47 +55,63 @@ class ModelEvaluation:
             data.test_y
         )
 
+        return train_acc, test_acc
+
     @staticmethod
     def create_classification_report(
-            bert_model: keras.Model, data: TextProcessor):
-        """
+            bert_model: keras.Model,
+            data: TextProcessor
+    ) -> Dict:
+        """This method generates a report describing on the
+        model's ability to classify the textual data.
 
-        :param bert_model:
-        :param data:
-        :return:
+        :param bert_model: The application specific (trained) BERT
+        model.
+        :type bert_model: keras.Model
+        :param data: Processed textual data.
+        :type data: TextProcessor
+        :return: A dictionary containing classification data.
+        :rtype: Dict
         """
         y_pred = bert_model.predict(data.test_x).argmax(axis=-1)
-        print(
-            classification_report(
+        report_dict = classification_report(
                 data.test_y,
                 y_pred,
-                target_names=DatasetsConfiguration.all_intents()
+                target_names=ExternalDatasets.all_intents()
             )
-        )
+
+        return report_dict
 
     @staticmethod
     def create_confusion_matrix(
-            bert_model: keras.Model, data: TextProcessor):
-        """
+            bert_model: keras.Model,
+            data: TextProcessor
+    ) -> None:
+        """This model will generate a confusion matrix from the
+        trained model and processed textual data.
 
-        :param bert_model:
-        :param data:
-        :return:
+        :param bert_model: The application specific (trained) BERT
+        model.
+        :type bert_model: keras.Model
+        :param data: Processed textual data.
+        :type data: TextProcessor
+        :return: None
+        :rtype: NoneType
         """
         y_pred = bert_model.predict(data.test_x).argmax(axis=-1)
         print(
             classification_report(
                 data.test_y,
                 y_pred,
-                target_names=DatasetsConfiguration.all_intents()
+                target_names=ExternalDatasets.all_intents()
             )
         )
         # Confusion matrix
         cm = confusion_matrix(data.test_y, y_pred)
         df_cm = pd.DataFrame(
             cm,
-            index=DatasetsConfiguration.all_intents(),
-            columns=DatasetsConfiguration.all_intents()
+            index=ExternalDatasets.all_intents(),
+            columns=ExternalDatasets.all_intents()
         )
 
         heat_map = sns.heatmap(df_cm, annot=True, fmt="d")
@@ -114,17 +137,34 @@ class ModelEvaluation:
         )
         plt.figure().clear()
 
+        return None
+
     @staticmethod
     def perform_regression_testing(
-            bert_model: keras.Model, data: TextProcessor):
+            bert_model: keras.Model,
+            data: TextProcessor
+    ) -> None:
+        """This method will perform regression testing on the
+        model (it is assumed this method is called after training)
+        . Where regression testing differs from the other tests in
+        that the result is recorded and a report is generated
+        which considers successive model builds for a time series
+        representation of the model's accuracy over the complete
+        build history.
+
+        :param bert_model: The application specific (trained) BERT
+        model.
+        :type bert_model: keras.Model
+        :param data: Processed textual data.
+        :type data: TextProcessor
+        :return: None
+        :rtype: NoneType
         """
 
-        :return:
-        :rtype:
-        """
+        # TODO - Deliver on the doc string.
         pred_tokens = map(
             Definition.get_tokenizer().tokenize,
-            DatasetsConfiguration.regression_data[
+            ExternalDatasets.regression_data[
                 TextProcessor.data_column_title
             ]
         )
@@ -148,10 +188,10 @@ class ModelEvaluation:
             axis=-1)
 
         for utterance, intent in zip(
-                DatasetsConfiguration.regression_data[
+                ExternalDatasets.regression_data[
                     TextProcessor.data_column_title
                 ],
                 predictions
         ):
             print("utterance:", utterance, "\nintent:",
-                  DatasetsConfiguration.all_intents()[intent])
+                  ExternalDatasets.all_intents()[intent])

@@ -3,6 +3,7 @@ fitter.py - The fitter.py module contains the Fitter
 class definition.
 """
 import os
+from typing import Any
 from tensorflow import keras
 from ..build.file_system_configuration import \
     FileSystemConfiguration
@@ -79,15 +80,25 @@ class Fitter:
         )
 
     @classmethod
-    def fit(cls, bert_model: keras.Model, data: TextProcessor):
-        """
+    def fit(
+            cls,
+            bert_model: keras.Model,
+            data: TextProcessor
+    ) -> Any:
+        """This method wraps the `fit` method of the `keras.Model`
+        object argument which returns an object representing the
+        history of thed build.
         
-        :param bert_model: 
-        :type bert_model: 
-        :param data: 
-        :type data: 
-        :return: 
-        :rtype: 
+        :param bert_model: The application specific (trained) BERT
+        model.
+        :type bert_model: keras.Model
+        :param data: Processed textual data.
+        :type data: TextProcessor
+        :return: A `History` object. Its `History.history`
+        attribute is a record of training loss values and metrics
+        values at successive epochs, as well as validation loss
+        values and validation metrics values (if applicable).
+        :rtype: Any
         """
         
         callbacks = list()

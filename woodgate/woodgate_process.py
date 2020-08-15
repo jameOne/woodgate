@@ -11,8 +11,8 @@ from .fine_tuning.text_processor import TextProcessor
 from .fine_tuning.dataset_retrieval_strategy import \
     DatasetRetrievalStrategy
 from .model.definition import Definition
-from .fine_tuning.datasets_configuration import \
-    DatasetsConfiguration
+from .fine_tuning.external_datasets import \
+    ExternalDatasets
 from .build.build_summary import BuildSummary
 from .model.evaluation import ModelEvaluation
 from .model.fitter import Fitter
@@ -47,49 +47,49 @@ class WoodgateProcess:
             "Retrieving training data"
         )
         DatasetRetrievalStrategy.retrieve_training_dataset(
-            url=DatasetsConfiguration.training_dataset_url
+            url=ExternalDatasets.training_dataset_url
         )
 
         WoodgateLogger.logger.info(
             "Retrieving testing data"
         )
         DatasetRetrievalStrategy.retrieve_testing_dataset(
-            url=DatasetsConfiguration.testing_dataset_url
+            url=ExternalDatasets.testing_dataset_url
         )
 
         WoodgateLogger.logger.info(
             "Retrieving evaluation data"
         )
         DatasetRetrievalStrategy.retrieve_evaluation_dataset(
-            url=DatasetsConfiguration.evaluation_dataset_url
+            url=ExternalDatasets.evaluation_dataset_url
         )
 
         WoodgateLogger.logger.info(
             "Retrieving regression data"
         )
         DatasetRetrievalStrategy.retrieve_regression_dataset(
-            url=DatasetsConfiguration.regression_dataset_url
+            url=ExternalDatasets.regression_dataset_url
         )
 
         WoodgateLogger.logger.info(
             "Setting training data"
         )
-        DatasetsConfiguration.set_training_data()
+        ExternalDatasets.set_training_data()
 
         WoodgateLogger.logger.info(
             "Setting testing data"
         )
-        DatasetsConfiguration.set_testing_data()
+        ExternalDatasets.set_testing_data()
 
         WoodgateLogger.logger.info(
             "Setting evaluation data"
         )
-        DatasetsConfiguration.set_evaluation_data()
+        ExternalDatasets.set_evaluation_data()
 
         WoodgateLogger.logger.info(
             "Setting regression data"
         )
-        DatasetsConfiguration.set_regression_data()
+        ExternalDatasets.set_regression_data()
 
         WoodgateLogger.logger.info(
             "Creating fine tuning dataset visuals: "
@@ -103,7 +103,7 @@ class WoodgateProcess:
             )
             bar_plots_created_successfully = False
             try:
-                DatasetsConfiguration.create_bar_plots()
+                ExternalDatasets.create_bar_plots()
                 bar_plots_created_successfully = True
             except OSError as err:
                 WoodgateLogger.logger.error(err)
@@ -123,7 +123,7 @@ class WoodgateProcess:
             )
             venn_diagrams_created = False
             try:
-                DatasetsConfiguration.create_venn_diagrams()
+                ExternalDatasets.create_venn_diagrams()
                 venn_diagrams_created = True
             except OSError as err:
                 WoodgateLogger.logger.error(err)
@@ -142,10 +142,10 @@ class WoodgateProcess:
         )
 
         data = TextProcessor(
-            DatasetsConfiguration.training_data,
-            DatasetsConfiguration.testing_data,
+            ExternalDatasets.training_data,
+            ExternalDatasets.testing_data,
             Definition.get_tokenizer(),
-            DatasetsConfiguration.all_intents()
+            ExternalDatasets.all_intents()
         )
 
         WoodgateLogger.logger.info(
@@ -168,7 +168,7 @@ class WoodgateProcess:
         WoodgateLogger.logger.info("Creating BERT model")
         bert_model = Definition.create_model(
             data.max_sequence_length,
-            len(DatasetsConfiguration.all_intents())
+            len(ExternalDatasets.all_intents())
         )
 
         ModelSummary.print(bert_model=bert_model)
