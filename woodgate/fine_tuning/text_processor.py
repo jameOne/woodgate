@@ -11,8 +11,8 @@ from bert.tokenization.bert_tokenization import FullTokenizer
 class TextProcessor:
     """
     TextProcessor - The TextProcessor class encapsulates logic
-    related to processing clean text (in CSV format) used to train
-    BERT for intent detection.
+    related to processing clean text (in CSV format) used to
+    train BERT for intent detection.
     """
     data_column_title = os.getenv(
         "DATA_COLUMN_TITLE",

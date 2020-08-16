@@ -17,16 +17,16 @@ from ..woodgate_logger import WoodgateLogger
 class ExternalDatasets:
     """
     ExternalDatasets - The ExternalDataset class encapsulates
-    logic related to training, testing, evaluation, and regression
-    datasets.
+    logic related to training, testing, evaluation, and
+    regression datasets.
     """
 
     #: The `training_dataset_url` attribute represents the
     #: location of the training dataset. This attribute should be
     #: a valid URL and accessible via the web. The URL will be
     #: passed to the DatasetRetrievalStrategy class whose
-    #: corresponding retrieve method will be responsible for using
-    #: the URL to download a copy of the dataset.
+    #: corresponding retrieve method will be responsible for
+    #: using the URL to download a copy of the dataset.
     training_dataset_url: str = os.getenv(
         "TRAINING_DATASET_URL",
         "https://drive.google.com/uc?"
@@ -37,8 +37,8 @@ class ExternalDatasets:
     #: location of the testing dataset. This attribute should be
     #: a valid URL and accessible via the web. The URL will be
     #: passed to the DatasetRetrievalStrategy class whose
-    #: corresponding retrieve method will be responsible for using
-    #: the URL to download a copy of the dataset.
+    #: corresponding retrieve method will be responsible for
+    #: using the URL to download a copy of the dataset.
     testing_dataset_url: str = os.getenv(
         "TESTING_DATASET_URL",
         "https://drive.google.com/uc?"
@@ -49,8 +49,8 @@ class ExternalDatasets:
     #: location of the evaluation dataset. This attribute should
     #: be a valid URL and accessible via the web. The URL will be
     #: passed to the DatasetRetrievalStrategy class whose
-    #: corresponding retrieve method will be responsible for using
-    #: the URL to download a copy of the dataset.
+    #: corresponding retrieve method will be responsible for
+    #: using the URL to download a copy of the dataset.
     evaluation_dataset_url: str = os.getenv(
         "EVALUATION_DATASET_URL",
         "https://drive.google.com/uc?"
@@ -61,8 +61,8 @@ class ExternalDatasets:
     #: location of the regression dataset. This attribute should
     #: be a valid URL and accessible via the web. The URL will be
     #: passed to the DatasetRetrievalStrategy class whose
-    #: corresponding retrieve method will be responsible for using
-    #: the URL to download a copy of the dataset.
+    #: corresponding retrieve method will be responsible for
+    #: using the URL to download a copy of the dataset.
     regression_dataset_url: str = os.getenv(
         "REGRESSION_DATASET_URL",
         "https://drive.google.com/uc?"
@@ -84,9 +84,10 @@ class ExternalDatasets:
     def set_training_data(cls) -> None:
         """This method will attempt to set the `training_data`
         attribute by reading the file located on the host
-        file system at `$TRAINING_PATH` into a `pandas.DataFrame`.
-        It is assumed the file located at `$TRAINING_PATH` is in
-        CSV format and having a `.csv` file extension.
+        file system at `$TRAINING_PATH` into a
+        `pandas.DataFrame`. It is assumed the file located at
+        `$TRAINING_PATH` is in CSV format and having a `.csv`
+        file extension.
 
 
         :return: None
@@ -461,9 +462,9 @@ class ExternalDatasets:
     @classmethod
     def all_intents(cls) -> List[str]:
         """This method will call all `*_intents_list` methods and
-        compile them into a single list and then call the build in
-        `set` function on the list. The result is then converted
-        back into a list and returned.
+        compile them into a single list and then call the build
+        in `set` function on the list. The result is then
+        converted back into a list and returned.
 
         :return: A list of unique intents found across all \
         datasets.
@@ -491,8 +492,8 @@ class ExternalDatasets:
         :rtype: NoneType
         """
 
-        # It would be unusual for the set of testing intents to be
-        # unequal to the set of training intents.
+        # It would be unusual for the set of testing intents to
+        # be unequal to the set of training intents.
         if cls.training_intents_list() \
                 != cls.testing_intents_list():
             WoodgateLogger.logger.warn(
@@ -551,23 +552,23 @@ class ExternalDatasets:
             "intents": cls.all_intents(),
             "training_set": {
                 "intents": cls.training_intents_list(),
-                "counts": cls.training_intents_counts().to_json(
-                )
+                "counts": cls.training_intents_counts()
+                .to_json()
             },
             "testing_set": {
                 "intents": cls.testing_intents_list(),
-                "counts": cls.testing_intents_counts().to_json(
-                )
+                "counts": cls.testing_intents_counts()
+                .to_json()
             },
             "evaluation_set": {
                 "intents": cls.evaluation_intents_list(),
-                "counts": cls.evaluation_intents_counts().to_json(
-                )
+                "counts": cls.evaluation_intents_counts()
+                .to_json()
             },
             "regression_set": {
                 "intents": cls.regression_intents_list(),
-                "counts": cls.regression_intents_counts().to_json(
-                )
+                "counts": cls.regression_intents_counts()
+                .to_json()
             }
         }
 
@@ -686,9 +687,9 @@ class ExternalDatasets:
 
     @classmethod
     def create_venn_diagrams(cls):
-        """The method will create six (6) Venn diagrams describing
-        two (2) sets and their intersections. The diagrams will be
-        stored in the
+        """The method will create six (6) Venn diagrams
+        describing two (2) sets and their intersections. The
+        diagrams will be stored in the
         `FileSystemConfiguration.datasets_summary_dir`
         directory as PNG files with `.png` file extensions.
 

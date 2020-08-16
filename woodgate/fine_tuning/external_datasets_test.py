@@ -15,7 +15,7 @@ from ..build.file_system_configuration import \
 
 class TestExternalDatasetsDefaults(unittest.TestCase):
     """
-    ExternalDatasetsDefaultsTest - This class encapsulates all
+    TestExternalDatasetsDefaults - This class encapsulates all
     logic related to unit testing the ExternalDatasets class using
     default file system configuration.
     """

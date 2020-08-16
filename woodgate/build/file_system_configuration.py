@@ -450,13 +450,13 @@ class FileSystemConfiguration:
     )
     os.makedirs(datasets_summary_dir, exist_ok=True)
 
-    #: The `bert_dir` attribute represents a directory on the host
-    #: file system containing the BERT transfer model and
+    #: The `bert_dir` attribute represents a directory on the
+    #: host file system containing the BERT transfer model and
     #: associated files. This attribute is set via the `BERT_DIR`
     #: environment variable. If the `BERT_DIR` environment
-    #: variable is not set, then the `bert_dir` attribute defaults
-    #: to `$WOODGATE_BASE_DIR/bert`. The program will attempt to
-    #: create `BERT_DIR` if it does not already exist.
+    #: variable is not set, then the `bert_dir` attribute
+    #: defaults to `$WOODGATE_BASE_DIR/bert`. The program will
+    #: attempt to create `BERT_DIR` if it does not already exist.
     bert_dir: str = os.getenv(
         "BERT_DIR",
         os.path.join(
@@ -466,9 +466,9 @@ class FileSystemConfiguration:
     )
     os.makedirs(bert_dir, exist_ok=True)
 
-    #: The `bert_config_file` attribute represents the name of the
-    #: BERT configuration JSON file. This attribute is set via the
-    #: `BERT_CONFIG_FILE` environment variable. If the
+    #: The `bert_config_file` attribute represents the name of
+    #: the BERT configuration JSON file. This attribute is set
+    #: via the `BERT_CONFIG_FILE` environment variable. If the
     #: `BERT_CONFIG_FILE` environment variable is not set, then
     #: the `bert_config_file` defaults to `bert_config.json`.
     bert_config_file: str = os.getenv(
@@ -522,10 +522,10 @@ class FileSystemConfiguration:
 
     #: The `bert_vocab_file` attribute represents the name of the
     #: BERT model's vocabulary file (`.txt` file extension).
-    #: This attribute is set via the `BERT_VOCAB_FILE` environment
-    #: variable. If the `BERT_VOCAB_FILE` environment variable is
-    #: not set, then the `bert_vocab_file` defaults to
-    #: `vocab.txt`.
+    #: This attribute is set via the `BERT_VOCAB_FILE`
+    #: environment variable. If the `BERT_VOCAB_FILE` environment
+    #: variable is not set, then the `bert_vocab_file` defaults
+    #: to `vocab.txt`.
     bert_vocab_file: str = os.getenv(
         "BERT_VOCAB_FILE",
         "vocab.txt"

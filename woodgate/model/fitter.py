@@ -3,7 +3,6 @@ fitter.py - The fitter.py module contains the Fitter
 class definition.
 """
 import os
-from typing import Any
 from tensorflow import keras
 from ..build.file_system_configuration import \
     FileSystemConfiguration
@@ -84,7 +83,7 @@ class Fitter:
             cls,
             bert_model: keras.Model,
             data: TextProcessor
-    ) -> object:
+    ) -> keras.callbacks.History:
         """This method wraps the `fit` method of the `keras.Model`
         object argument which returns an object representing the
         history of the build.

@@ -1,12 +1,15 @@
 #!/bin/bash
 
 # Download BERT model
-wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-12_H-768_A-12.zip
+wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-2_H-128_A-2.zip
 
-mkdir ./bert
+mkdir ./test
+mkdir ./test/bert
 
 # Unzip the file
-unzip uncased_L-12_H-768_A-12.zip -d ./bert/base
+unzip uncased_L-2_H-128_A-2.zip -d ./test/bert/tiny
+
+rm uncased_L-2_H-128_A-2.zip
 
 
 # https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-2_H-128_A-2.zip (tiny)

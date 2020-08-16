@@ -6,7 +6,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from .file_system_configuration import FileSystemConfiguration
-import tensorflow as tf
+from tensorflow import keras
 
 
 class BuildSummary:
@@ -17,7 +17,7 @@ class BuildSummary:
 
     @staticmethod
     def create_loss_over_epochs_plot(
-        build_history: tf.keras.callbacks.History
+        build_history: keras.callbacks.History
     ) -> None:
         """This method will generate an Loss vs. Epochs plot
         from the `tf.keras.callbacks.History` object. The
@@ -29,7 +29,7 @@ class BuildSummary:
         :param build_history: Accepts a History object, where \
         the History object is the return type of calling the \
         `fit` method on `tf.keras.Model` objects.
-        :type build_history: object
+        :type build_history: keras.callbacks.History
         :return: None
         :rtype: NoneType
         """
@@ -57,7 +57,7 @@ class BuildSummary:
 
     @staticmethod
     def create_accuracy_over_epochs_plot(
-            build_history: tf.keras.callbacks.History
+            build_history: keras.callbacks.History
     ) -> None:
         """This method will generate an Accuracy vs. Epochs plot
         from the `tf.keras.callbacks.History` object. The
@@ -69,7 +69,7 @@ class BuildSummary:
         :param build_history: Accepts a `History` object, where \
         the `History` object is the return type of calling the \
         `fit` method on `keras.Model` objects.
-        :type build_history: object
+        :type build_history: keras.callbacks.History
         :return: None
         :rtype: NoneType
         """
