@@ -27,10 +27,16 @@ Welcome to Woodgate's documentation!
 .. automodule:: woodgate.build.sanity_check
     :members:
 
-.. automodule:: woodgate.fine_tuning.external_datasets
+.. automodule:: woodgate.transfer.bert_model
     :members:
 
-.. automodule:: woodgate.fine_tuning.text_processor
+.. automodule:: woodgate.transfer.bert_retrieval_strategy
+    :members:
+
+.. automodule:: woodgate.tuning.external_datasets
+    :members:
+
+.. automodule:: woodgate.tuning.text_processor
     :members:
 
 .. automodule:: woodgate.model.compiler
