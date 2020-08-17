@@ -5,7 +5,7 @@ the SanityCheck class definition.
 from tensorflow import keras
 
 from ..model.evaluation import ModelEvaluation
-from ..fine_tuning.text_processor import TextProcessor
+from ..tuning.text_processor import TextProcessor
 from .file_system_configuration import FileSystemConfiguration
 
 

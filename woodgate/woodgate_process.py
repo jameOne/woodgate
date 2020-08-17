@@ -7,11 +7,11 @@ import datetime
 from woodgate.woodgate_logger import WoodgateLogger
 from .build.file_system_configuration import \
     FileSystemConfiguration
-from .fine_tuning.text_processor import TextProcessor
-from .fine_tuning.dataset_retrieval_strategy import \
+from .tuning.text_processor import TextProcessor
+from .tuning.dataset_retrieval_strategy import \
     DatasetRetrievalStrategy
 from .model.definition import Definition
-from .fine_tuning.external_datasets import \
+from .tuning.external_datasets import \
     ExternalDatasets
 from .build.build_summary import BuildSummary
 from .model.evaluation import ModelEvaluation

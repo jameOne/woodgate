@@ -15,10 +15,10 @@ from typing import Tuple, Any, Dict
 import matplotlib.pyplot as plt
 from tensorflow import keras
 
-from ..fine_tuning.external_datasets import \
+from ..tuning.external_datasets import \
     ExternalDatasets
 from ..model.definition import Definition
-from ..fine_tuning.text_processor import TextProcessor
+from ..tuning.text_processor import TextProcessor
 from ..build.file_system_configuration import \
     FileSystemConfiguration
 

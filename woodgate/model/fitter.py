@@ -6,7 +6,7 @@ import os
 from tensorflow import keras
 from ..build.file_system_configuration import \
     FileSystemConfiguration
-from ..fine_tuning.text_processor import TextProcessor
+from ..tuning.text_processor import TextProcessor
 
 
 class Fitter:
