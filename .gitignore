@@ -5,6 +5,7 @@ log/**/*
 data/**/*
 bert/**/*
 docs/_build/**/*
+docs/_static/**/*
 .pytest_cache
 __pycache__
 */__pycache__

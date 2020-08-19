@@ -4,11 +4,10 @@ BertRetrievalStrategy class definition.
 """
 import os
 import subprocess
-from urllib.parse import urljoin
 from ..build.file_system_configuration import \
     FileSystemConfiguration
 from ..woodgate_logger import WoodgateLogger
-from .bert_model import BertModel
+from .bert_model_parameters import BertModelParameters
 
 
 class BertRetrievalStrategy:
@@ -16,6 +15,8 @@ class BertRetrievalStrategy:
     BertRetrievalStrategy - This class encapsulates logic
     related to downloading Google's BERT for transfer learning.
     """
+    #: The `bert_model_parameters` attribute
+    bert_model_parameters = BertModelParameters()
 
     #: The `bert_base_url` attribute represents the base
     #: URL/endpoint where the BERT model is hosted. This
@@ -28,7 +29,7 @@ class BertRetrievalStrategy:
     #: where BERT is hosted.
     bert_base_url: str = os.getenv(
         "BERT_BASE_URL",
-        'https://storage.googleapis.com/'
+        'https://storage.googleapis.com'
     )
 
     #: The `bert_models_url_component` is the URL component
@@ -57,7 +58,7 @@ class BertRetrievalStrategy:
     #: where BERT is hosted.
     bert_models_url: str = os.getenv(
         "BERT_MODELS_URL",
-        urljoin(
+        os.path.join(
             bert_base_url,
             bert_models_url_component
         )
@@ -89,7 +90,7 @@ class BertRetrievalStrategy:
     #: where BERT is hosted.
     bert_version_url: str = os.getenv(
         "BERT_VERSION_URL",
-        urljoin(
+        os.path.join(
             bert_models_url,
             bert_version_url_component
         )
@@ -108,9 +109,9 @@ class BertRetrievalStrategy:
     bert_zip_url_component: str = os.getenv(
         "BERT_ZIP_URL_COMPONENT",
         "uncased_"
-        + f"L-{BertModel.bert_l_param}_"
-        + f"H-{BertModel.bert_h_param}_"
-        + f"A-{BertModel.bert_a_param}.zip"
+        + f"L-{bert_model_parameters.bert_l_param}_"
+        + f"H-{bert_model_parameters.bert_h_param}_"
+        + f"A-{bert_model_parameters.bert_a_param}.zip"
     )
 
     #: The `bert_zip_url` attribute represents the URL to the
@@ -124,7 +125,7 @@ class BertRetrievalStrategy:
     #: where BERT is hosted.
     bert_zip_url: str = os.getenv(
         "BERT_ZIP_URL",
-        urljoin(
+        os.path.join(
             bert_version_url,
             bert_zip_url_component
         )
@@ -137,7 +138,7 @@ class BertRetrievalStrategy:
         :return: None
         :rtype: NoneType
         """
-
+        print(cls.bert_zip_url)
         # downloading the models is an expensive process
         # so first make sure we actually need the files
         if not os.path.isfile(
