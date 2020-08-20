@@ -5,13 +5,12 @@ contains the DatasetsConfiguration class definition.
 """
 import os
 import json
-from typing import List, Set, Dict, Union
+from typing import List, Set, Dict, Union, Any
 import pandas as pd
-from ..build.file_system_configuration import \
-    FileSystemConfiguration
 from matplotlib_venn import venn2
 import matplotlib.pyplot as plt
 from ..woodgate_logger import WoodgateLogger
+from ..woodgate_settings import WoodgateSettings
 
 
 class ExternalDatasets:
@@ -94,13 +93,13 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.training_data = pd.read_csv(
-            FileSystemConfiguration.training_path
+            WoodgateSettings.get_training_path()
         )
 
         return None
 
     @classmethod
-    def get_training_data(cls) -> Union[pd.DataFrame, None]:
+    def get_training_data(cls) -> pd.DataFrame:
         """This method is a simple getter which will return the
         `training_data` attribute. Be sure to call the
         `set_training_data` method or else the
@@ -127,9 +126,15 @@ class ExternalDatasets:
         :return: A list of unique intents found in training data.
         :rtype: List[str]
         """
-        return sorted(
-            cls.get_training_data().intent.unique().tolist()
-        )
+        training_intents_list = list()
+        try:
+            training_intents_list = sorted(
+                cls.get_training_data()["intent"]
+                .unique().tolist()
+            )
+        except KeyError as err:
+            WoodgateLogger.logger.error(err)
+        return training_intents_list
 
     #: The `training_set` attribute represents a set
     #: of unique intents found in the `training_data`.
@@ -189,7 +194,7 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.testing_data = pd.read_csv(
-            FileSystemConfiguration.testing_path
+            WoodgateSettings.get_testing_path()
         )
         return None
 
@@ -285,7 +290,7 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.evaluation_data = pd.read_csv(
-            FileSystemConfiguration.evaluation_path
+            WoodgateSettings.get_evaluation_path()
         )
         return None
 
@@ -367,7 +372,7 @@ class ExternalDatasets:
     #: (labelled fine_tuning_text_processor.data_column_title)
     #: , and one (1) for `label` i.e. the intent (labelled
     #: fine_tuning_text_processor.label_column_title)
-    regression_data: Union[pd.DataFrame, None] = None
+    regression_data: pd.DataFrame = None
 
     @classmethod
     def set_regression_data(cls) -> None:
@@ -383,7 +388,7 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.regression_data = pd.read_csv(
-            FileSystemConfiguration.regression_path
+            WoodgateSettings.get_regression_path()
         )
         return None
 
@@ -539,7 +544,7 @@ class ExternalDatasets:
     #: intent lists or intent count lists respectively.
     @classmethod
     def intents_dict(cls) -> Dict[
-        str, Union[List[str], pd.Series]
+        str, Any
     ]:
         """This method will return a Python dictionary containing
         the intents data found across all datasets.
@@ -553,31 +558,31 @@ class ExternalDatasets:
             "training_set": {
                 "intents": cls.training_intents_list(),
                 "counts": cls.training_intents_counts()
-                .to_json()
+                .to_dict()
             },
             "testing_set": {
                 "intents": cls.testing_intents_list(),
                 "counts": cls.testing_intents_counts()
-                .to_json()
+                .to_dict()
             },
             "evaluation_set": {
                 "intents": cls.evaluation_intents_list(),
                 "counts": cls.evaluation_intents_counts()
-                .to_json()
+                .to_dict()
             },
             "regression_set": {
                 "intents": cls.regression_intents_list(),
                 "counts": cls.regression_intents_counts()
-                .to_json()
+                .to_dict()
             }
         }
 
     @classmethod
-    def create_data_json(cls) -> None:
+    def create_intents_data_json(cls) -> None:
         """This method will create one (1) file containing data
         which describes the distribution of intents across fine
         tuning datasets. The file will be stored in the
-        `FileSystemConfiguration.datasets_summary_dir` directory
+        `WoodgateSettings.datasets_summary_dir` directory
         in JSON format with `.json` file extension.
 
         1 - Intents Data
@@ -588,7 +593,7 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         intents_data_json = os.path.join(
-            FileSystemConfiguration.datasets_summary_dir,
+            WoodgateSettings.datasets_summary_dir,
             "intentsData.json"
         )
         with open(intents_data_json, "w+") as file:
@@ -599,11 +604,11 @@ class ExternalDatasets:
         return None
 
     @classmethod
-    def create_bar_plots(cls) -> None:
+    def create_intents_bar_plots(cls) -> None:
         """The method will create four (4) bar plots describing
         the distribution of intents across the four (4) fine
         tuning datasets. The plots will be stored in the
-        `FileSystemConfiguration.datasets_summary_dir` directory
+        `WoodgateSettings.datasets_summary_dir` directory
         as PNG files with `.png` file extensions.
 
         1 - Training Intents
@@ -629,11 +634,11 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_bar_plot_training.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 2
         fig, axs = plt.subplots()
@@ -645,11 +650,11 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_bar_plot_testing.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 3
         fig, axs = plt.subplots()
@@ -661,11 +666,11 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_bar_plot_evaluation.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 4
         fig, axs = plt.subplots()
@@ -677,20 +682,20 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_bar_plot_regression.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         return None
 
     @classmethod
-    def create_venn_diagrams(cls):
+    def create_intents_venn_diagrams(cls):
         """The method will create six (6) Venn diagrams
         describing two (2) sets and their intersections. The
         diagrams will be stored in the
-        `FileSystemConfiguration.datasets_summary_dir`
+        `WoodgateSettings.datasets_summary_dir`
         directory as PNG files with `.png` file extensions.
 
         1 - Training and Evaluation
@@ -724,14 +729,13 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_venn_training_evaluation.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 2
-        plt.figure(figsize=(4, 4))
         venn2(
             [
                 cls.training_intents_set(),
@@ -743,14 +747,13 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_venn_training_testing.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 3
-        plt.figure(figsize=(4, 4))
         venn2(
             [
                 cls.training_intents_set(),
@@ -762,14 +765,13 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_venn_training_regression.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 4
-        plt.figure(figsize=(4, 4))
         venn2(
             [
                 cls.evaluation_intents_set(),
@@ -781,14 +783,13 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_venn_evaluation_testing.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 5
-        plt.figure(figsize=(4, 4))
         venn2(
             [
                 cls.evaluation_intents_set(),
@@ -800,14 +801,13 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_venn_evaluation_regression.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         # Plot 6
-        plt.figure(figsize=(4, 4))
         venn2(
             [
                 cls.testing_intents_set(),
@@ -819,10 +819,10 @@ class ExternalDatasets:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.datasets_summary_dir,
+                WoodgateSettings.datasets_summary_dir,
                 "intents_venn_testing_regression.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         return None

@@ -18,6 +18,10 @@ class TestBertModelParametersDefault(unittest.TestCase):
 
         :return:
         """
+        os.environ["BERT_L_PARAM"] = "12"
+        os.environ["BERT_H_PARAM"] = "768"
+        os.environ["BERT_A_PARAM"] = "12"
+
         bert_model_parameters = BertModelParameters()
 
         # make sure there is a default L parameter
@@ -59,6 +63,15 @@ class TestBertModelParametersDefault(unittest.TestCase):
         self.assertEqual(
             bert_model_parameters.bert_a_param,
             8
+        )
+
+        os.environ["BERT_H_PARAM"] = "768"
+
+        bert_model_parameters = BertModelParameters()
+
+        self.assertEqual(
+            bert_model_parameters.bert_a_param,
+            12
         )
 
         os.environ["BERT_H_PARAM"] = "1024"
@@ -119,6 +132,11 @@ class TestBertModelParameters(unittest.TestCase):
         os.environ["BERT_L_PARAM"] = "0"
 
         def bert_model_parameters():
+            """
+
+            :return:
+            :rtype:
+            """
             BertModelParameters()
 
         self.assertRaises(
@@ -134,6 +152,11 @@ class TestBertModelParameters(unittest.TestCase):
         os.environ["BERT_H_PARAM"] = "0"
 
         def bert_model_parameters():
+            """
+
+            :return:
+            :rtype:
+            """
             BertModelParameters()
 
         self.assertRaises(
@@ -141,9 +164,52 @@ class TestBertModelParameters(unittest.TestCase):
             bert_model_parameters
         )
 
+    # def test_init_wo_params(self) -> None:
+    #     """
+    #
+    #     :return:
+    #     :rtype:
+    #     """
+    #     bert_model_parameters = BertModelParameters()
+    #
+    #     self.assertEqual(
+    #         bert_model_parameters.bert_l_param,
+    #         12
+    #     )
+    #
+    #     self.assertEqual(
+    #         bert_model_parameters.bert_h_param,
+    #         768
+    #     )
+    #
+    #     self.assertEqual(
+    #         bert_model_parameters.bert_a_param,
+    #         12
+    #     )
 
+    def test_init_w_params(self) -> None:
+        """
+
+        :return:
+        :rtype:
+        """
+        bert_model_parameters = BertModelParameters(4, 256)
+
+        self.assertEqual(
+            bert_model_parameters.bert_l_param,
+            4
+        )
+
+        self.assertEqual(
+            bert_model_parameters.bert_h_param,
+            256
+        )
+
+        self.assertEqual(
+            bert_model_parameters.bert_a_param,
+            4
+        )
 
 
 if __name__ == '__main__':
     unittest.main()
-

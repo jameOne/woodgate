@@ -3,11 +3,12 @@ bert_retrieval_strategy_test.py - This module contains the unit
 tests related to the bert_retrieval_strategy.py module.
 """
 import os
+import glob
 import unittest
 import shutil
 from .bert_retrieval_strategy import BertRetrievalStrategy
-from ..build.file_system_configuration import \
-    FileSystemConfiguration
+from ..woodgate_settings import WoodgateSettings
+from .bert_model_parameters import BertModelParameters
 
 
 class TestBertRetrievalStrategy(unittest.TestCase):
@@ -39,11 +40,19 @@ class TestBertRetrievalStrategy(unittest.TestCase):
 
         :return:
         """
-        BertRetrievalStrategy.download_bert()
+
+        bert_retrieval_strategy = BertRetrievalStrategy(
+            bert_model_parameters=BertModelParameters(
+                bert_h_param=128,
+                bert_l_param=2
+            )
+        )
+
+        bert_retrieval_strategy.download_bert()
 
         self.assertTrue(
-            os.path.isfile(
-                FileSystemConfiguration.bert_model_path
+            glob.glob(
+                f"{WoodgateSettings.get_bert_model_path()}*"
             )
         )
 

@@ -3,15 +3,15 @@ storage_strategy.py - The storage_strategy.py module
 contains the StorageStrategy class which encapsulates logic
 related to persisting the model after fine tuning.
 """
-from ..build.file_system_configuration import \
-    FileSystemConfiguration
+import tensorflow as tf
 from tensorflow import keras
+from ..woodgate_settings import WoodgateSettings
 
 
 class StorageStrategy:
     """
-    StorageStrategy - The StorageStrategy class encapsulates logic
-    related to persisting the model after fine tuning.
+    StorageStrategy - The StorageStrategy class encapsulates
+    logig related to persisting the model after fine tuning.
     """
 
     @staticmethod
@@ -25,9 +25,25 @@ class StorageStrategy:
         :return: None
         :rtype: NoneType
         """
-        keras.models.save_model(
+        tf.saved_model.save(
             bert_model,
-            FileSystemConfiguration.model_build_dir
+            WoodgateSettings.model_build_dir
         )
 
         return None
+
+    @staticmethod
+    def load_model() -> keras.Model:
+        """The `load_model` method is a convenience method
+        which wraps the `keras.models.load_model(...)` method,
+        called with the `WoodgateSettings.model_build_dir`
+        attribute as it's argument.
+
+        :return: A `keras.Model` object loaded from file system.
+        :rtype: keras.Model
+        """
+        loaded_model = keras.models.load_model(
+            WoodgateSettings.model_build_dir
+        )
+
+        return loaded_model

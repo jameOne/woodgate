@@ -3,15 +3,20 @@ text_processor_test.py - Module - The text_processor_test.py
 module contains all unit tests related to the text_processor.py
 module.
 """
+import os
+import glob
 import shutil
 import unittest
-import subprocess
 import pandas as pd
 import numpy as np
 from .text_processor import TextProcessor
 from ..model.definition import Definition
+from ..woodgate_settings import WoodgateSettings
 from ..build.file_system_configuration import \
     FileSystemConfiguration
+from ..transfer.bert_model_parameters import BertModelParameters
+from ..transfer.bert_retrieval_strategy import \
+    BertRetrievalStrategy
 
 
 class TestTextProcessor(unittest.TestCase):
@@ -22,58 +27,49 @@ class TestTextProcessor(unittest.TestCase):
 
     def setUp(self) -> None:
         """
-        wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-2_H-128_A-2.zip
-
-        mkdir ./test
-        mkdir ./test/bert
-
-        # Unzip the file
-        unzip uncased_L-2_H-128_A-2.zip -d ./test/bert/tiny
-
-        rm uncased_L-2_H-128_A-2.zip
 
         :return:
+        :rtype:
         """
-
-        process = subprocess.Popen(
-            [
-                'wget',
-                'https://storage.googleapis.com/bert_models/'
-                + '2020_02_20/uncased_L-2_H-128_A-2.zip'
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        FileSystemConfiguration(
+            woodgate_settings=WoodgateSettings
         )
-        _ = process.communicate()
 
-        process = subprocess.Popen(
-            [
-                'unzip',
-                'uncased_L-2_H-128_A-2.zip',
-                '-d',
-                FileSystemConfiguration.bert_dir
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        bert_model_parameters = BertModelParameters(
+            bert_h_param=128,
+            bert_l_param=2
         )
-        _ = process.communicate()
 
-        process = subprocess.Popen(
-            [
-                'rm',
-                'uncased_L-2_H-128_A-2.zip'
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        bert_retrieval_strategy = BertRetrievalStrategy(
+            bert_model_parameters=bert_model_parameters
         )
-        _ = process.communicate()
 
-    def tearDown(self) -> None:
+        bert_retrieval_strategy.download_bert()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
         """
 
         :return:
+        :rtype:
         """
-        shutil.rmtree(FileSystemConfiguration.woodgate_base_dir)
+        woodgate_base_dir = os.path.join(
+            os.path.expanduser("~"),
+            "woodgate"
+        )
+        shutil.rmtree(woodgate_base_dir)
+
+    def test_setup(self) -> None:
+        """
+
+        :return:
+        :rtype:
+        """
+        self.assertTrue(
+            glob.glob(
+                f"{WoodgateSettings.get_bert_model_path()}*"
+            )
+        )
 
     def test_text_processor(self) -> None:
         """
@@ -81,7 +77,9 @@ class TestTextProcessor(unittest.TestCase):
         :return:
         """
 
-        FileSystemConfiguration()
+        FileSystemConfiguration(
+            woodgate_settings=WoodgateSettings
+        )
 
         test = pd.DataFrame({
             "text": [

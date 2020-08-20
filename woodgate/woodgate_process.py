@@ -16,10 +16,12 @@ from .tuning.external_datasets import \
 from .build.build_summary import BuildSummary
 from .model.evaluation import ModelEvaluation
 from .model.fitter import Fitter
-from .model.model_summary import ModelSummary
 from .model.compiler import Compiler
 from .model.storage_strategy import StorageStrategy
-from .build.sanity_check import SanityCheck
+from .transfer.bert_model_parameters import BertModelParameters
+from .transfer.bert_retrieval_strategy import \
+    BertRetrievalStrategy
+from .woodgate_settings import WoodgateSettings
 
 
 class WoodgateProcess:
@@ -30,11 +32,13 @@ class WoodgateProcess:
     """
 
     @staticmethod
-    def run():
-        """
+    def run() -> None:
+        """The `run` method starts the main build process. The
+        `WoodgateProcess.run()` method is what one would likely
+        call from a `main.py` module.
 
-        :return:
-        :rtype:
+        :return: None
+        :rtype: NoneType
         """
         start_time = datetime.datetime.now()
 
@@ -44,31 +48,43 @@ class WoodgateProcess:
         )
 
         WoodgateLogger.logger.info(
+            "Initializing file system configuration"
+        )
+        FileSystemConfiguration(
+            woodgate_settings=WoodgateSettings
+        )
+
+        WoodgateLogger.logger.info(
             "Retrieving training data"
         )
-        DatasetRetrievalStrategy.retrieve_training_dataset(
-            url=ExternalDatasets.training_dataset_url
+        DatasetRetrievalStrategy.retrieve_tuning_dataset(
+            url=ExternalDatasets.training_dataset_url,
+            output=WoodgateSettings.get_training_path()
         )
 
         WoodgateLogger.logger.info(
             "Retrieving testing data"
         )
-        DatasetRetrievalStrategy.retrieve_testing_dataset(
-            url=ExternalDatasets.testing_dataset_url
+        DatasetRetrievalStrategy.retrieve_tuning_dataset(
+            url=ExternalDatasets.testing_dataset_url,
+            output=WoodgateSettings.get_testing_path()
+
         )
 
         WoodgateLogger.logger.info(
             "Retrieving evaluation data"
         )
-        DatasetRetrievalStrategy.retrieve_evaluation_dataset(
-            url=ExternalDatasets.evaluation_dataset_url
+        DatasetRetrievalStrategy.retrieve_tuning_dataset(
+            url=ExternalDatasets.evaluation_dataset_url,
+            output=WoodgateSettings.get_evaluation_path()
         )
 
         WoodgateLogger.logger.info(
             "Retrieving regression data"
         )
-        DatasetRetrievalStrategy.retrieve_regression_dataset(
-            url=ExternalDatasets.regression_dataset_url
+        DatasetRetrievalStrategy.retrieve_tuning_dataset(
+            url=ExternalDatasets.regression_dataset_url,
+            output=WoodgateSettings.get_regression_path()
         )
 
         WoodgateLogger.logger.info(
@@ -92,50 +108,43 @@ class WoodgateProcess:
         ExternalDatasets.set_regression_data()
 
         WoodgateLogger.logger.info(
-            "Creating fine tuning dataset visuals: "
-            + f"{FileSystemConfiguration.create_dataset_visuals}"
+            "Creating JSON of intent "
+            + "classification bins/buckets"
         )
+        ExternalDatasets.create_intents_data_json()
 
-        if FileSystemConfiguration.create_dataset_visuals:
+        if WoodgateSettings.create_dataset_visuals:
             WoodgateLogger.logger.info(
                 "Creating bar plots of intent "
                 + "classification bins/buckets"
             )
-            bar_plots_created_successfully = False
-            try:
-                ExternalDatasets.create_bar_plots()
-                bar_plots_created_successfully = True
-            except OSError as err:
-                WoodgateLogger.logger.error(err)
-            finally:
-                WoodgateLogger.logger.error(
-                    "An unknown error occurred while "
-                    + "creating bar plots from fine tuning data"
-                )
-            WoodgateLogger.logger.info(
-                "Bar plots of fine tuning data created:"
-                + f"{bar_plots_created_successfully}"
-            )
+            ExternalDatasets.create_intents_bar_plots()
 
             WoodgateLogger.logger.info(
                 "Creating venn diagrams of intent "
                 + "classification bins/buckets"
             )
-            venn_diagrams_created = False
-            try:
-                ExternalDatasets.create_venn_diagrams()
-                venn_diagrams_created = True
-            except OSError as err:
-                WoodgateLogger.logger.error(err)
-            finally:
-                WoodgateLogger.logger.error(
-                    "An unknown error occurred while creating "
-                    + "venn diagrams from fine tuning data"
-                )
-            WoodgateLogger.logger.info(
-                "Venn diagrams of fine tuning data created: "
-                + f"{venn_diagrams_created}"
-            )
+            ExternalDatasets.create_intents_venn_diagrams()
+
+        WoodgateLogger.logger.info(
+            "Initializing BERT model parameters"
+        )
+
+        bert_model_parameters = BertModelParameters()
+
+        WoodgateLogger.logger.info(
+            "Initializing BERT retrieval strategy"
+        )
+
+        bert_retrieval_strategy = BertRetrievalStrategy(
+            bert_model_parameters=bert_model_parameters
+        )
+
+        WoodgateLogger.logger.info(
+            "Retrieving BERT model for transfer learning"
+        )
+
+        bert_retrieval_strategy.download_bert()
 
         WoodgateLogger.logger.info(
             "Processing textual data for training"
@@ -161,7 +170,7 @@ class WoodgateProcess:
             + f"{data.train_y[0]}"
         )
         WoodgateLogger.logger.info(
-            "data max_length_sequence:"
+            "data max_length_sequence: "
             + f"{data.max_sequence_length}"
         )
 
@@ -171,7 +180,10 @@ class WoodgateProcess:
             len(ExternalDatasets.all_intents())
         )
 
-        ModelSummary.print(bert_model=bert_model)
+        WoodgateLogger.logger.info(
+            "Printing summary of BERT model"
+        )
+        bert_model.summary()
 
         WoodgateLogger.logger.info(
             "Compiling BERT model"
@@ -181,58 +193,48 @@ class WoodgateProcess:
             "BERT model compilation complete"
         )
 
-        WoodgateLogger.logger.info("Generating build history")
-        build_history = Fitter.fit(
+        WoodgateLogger.logger.info(
+            "Initializing model fitter"
+        )
+        model_fitter = Fitter(
+            woodgate_settings=WoodgateSettings
+        )
+
+        WoodgateLogger.logger.info(
+            "Generating build history"
+        )
+        build_history = model_fitter.fit(
             bert_model=bert_model,
             data=data
         )
 
         WoodgateLogger.logger.info(
-            "Creating build history visuals: "
-            + f"{FileSystemConfiguration.create_build_visuals}"
+            "Creating accuracy vs. epochs JSON"
         )
-        if FileSystemConfiguration.create_build_visuals:
+        BuildSummary.create_accuracy_over_epochs_json(
+            build_history=build_history
+        )
+
+        WoodgateLogger.logger.info(
+            "Creating loss vs. epochs JSON"
+        )
+        BuildSummary.create_loss_over_epochs_json(
+            build_history=build_history
+        )
+
+        if WoodgateSettings.create_build_visuals:
             WoodgateLogger.logger.info(
                 "Creating plot of accuracy vs. epochs"
             )
-            accuracy_over_epochs_plot_created = False
-            try:
-                BuildSummary.create_accuracy_over_epochs_plot(
-                    build_history=build_history
-                )
-                accuracy_over_epochs_plot_created = True
-            except OSError as err:
-                WoodgateLogger.logger.error(err)
-            finally:
-                WoodgateLogger.logger.error(
-                    "An unknown error occurred while creating "
-                    + "accuracy over epochs plot from "
-                    + "build history"
-                )
-            WoodgateLogger.logger.info(
-                "Plot of accuracy vs. epochs created:"
-                + f"{accuracy_over_epochs_plot_created}"
+            BuildSummary.create_accuracy_over_epochs_plot(
+                build_history=build_history
             )
 
             WoodgateLogger.logger.info(
                 "Creating plot of loss vs. epochs"
             )
-            loss_over_epochs_plot_created = False
-            try:
-                BuildSummary.create_loss_over_epochs_plot(
-                    build_history=build_history
-                )
-                loss_over_epochs_plot_created = True
-            except OSError as err:
-                WoodgateLogger.logger.error(err)
-            finally:
-                WoodgateLogger.logger.error(
-                    "An unknown error occurred while creating"
-                    + "loss over epochs plot from build history"
-                )
-            WoodgateLogger.logger.info(
-                "Plot of loss vs. epochs created:"
-                + f"{loss_over_epochs_plot_created}"
+            BuildSummary.create_loss_over_epochs_plot(
+                build_history=build_history
             )
 
         WoodgateLogger.logger.info(
@@ -267,13 +269,32 @@ class WoodgateProcess:
             data=data
         )
 
+        WoodgateLogger.logger.info(
+            "Creating regression test results CSV"
+        )
+        ModelEvaluation.create_regression_test_results_csv()
+
+        WoodgateLogger.logger.info(
+            "Creating regression test results JSON"
+        )
+        ModelEvaluation.create_regression_test_results_json()
+
+        if WoodgateSettings.create_evaluation_visuals:
+            WoodgateLogger.logger.info(
+                "Creating pie chart of regression test results"
+            )
+            ModelEvaluation\
+                .create_regression_test_results_pie_chart()
+
         WoodgateLogger.logger.info("Saving model to disk")
         StorageStrategy.save_model(bert_model=bert_model)
 
-        WoodgateLogger.logger.info("Checking build sanity")
-        SanityCheck.check_sanity(data)
+        # WoodgateLogger.logger.info("Checking build sanity")
+        # SanityCheck.check_sanity(data)
         build_duration = datetime.datetime.now() - start_time
         WoodgateLogger.logger.info(
             "Build process completed: "
             + f"{build_duration}"
         )
+
+        return None

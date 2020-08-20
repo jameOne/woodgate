@@ -4,6 +4,8 @@ class which encapsulates logic related to evaluating the model
 build.
 """
 import os
+import json
+from typing import Tuple, Any, Dict, List
 from sklearn.metrics import (
     confusion_matrix,
     classification_report
@@ -11,7 +13,6 @@ from sklearn.metrics import (
 import pandas as pd
 import seaborn as sns
 import numpy as np
-from typing import Tuple, Any, Dict
 import matplotlib.pyplot as plt
 from tensorflow import keras
 
@@ -19,8 +20,7 @@ from ..tuning.external_datasets import \
     ExternalDatasets
 from ..model.definition import Definition
 from ..tuning.text_processor import TextProcessor
-from ..build.file_system_configuration import \
-    FileSystemConfiguration
+from ..woodgate_settings import WoodgateSettings
 
 
 class ModelEvaluation:
@@ -28,6 +28,10 @@ class ModelEvaluation:
     ModelEvaluation - Class - The ModelEvaluation class
     encapsulates logic related to evaluating the model build.
     """
+
+    #: The `regression_test_records` attribute represents a list
+    #:
+    regression_test_records: List[Dict[str, Any]] = list()
 
     @staticmethod
     def evaluate_model_accuracy(
@@ -75,10 +79,10 @@ class ModelEvaluation:
         """
         y_pred = bert_model.predict(data.test_x).argmax(axis=-1)
         report_dict = classification_report(
-                data.test_y,
-                y_pred,
-                target_names=ExternalDatasets.all_intents()
-            )
+            data.test_y,
+            y_pred,
+            target_names=ExternalDatasets.all_intents()
+        )
 
         return report_dict
 
@@ -131,26 +135,27 @@ class ModelEvaluation:
         plt.tight_layout()
         plt.savefig(
             os.path.join(
-                FileSystemConfiguration.evaluation_dir,
+                WoodgateSettings.evaluation_summary_dir,
                 "confusion_matrix.png"
             )
         )
-        plt.figure().clear()
+        plt.clf()
 
         return None
 
-    @staticmethod
+    @classmethod
     def perform_regression_testing(
+            cls,
             bert_model: keras.Model,
             data: TextProcessor
     ) -> None:
         """This method will perform regression testing on the
-        model (it is assumed this method is called after training)
-        . Where regression testing differs from the other tests in
-        that the result is recorded and a report is generated
-        which considers successive model builds for a time series
-        representation of the model's accuracy over the complete
-        build history.
+        model (it is assumed this method is called after
+        training). Where regression testing differs from the
+        other tests in that the result is recorded and a report
+        is generated which considers successive model builds for
+        a time series representation of the model's accuracy
+        over the complete build history.
 
         :param bert_model: The application specific (trained) \
         BERT model.
@@ -170,16 +175,15 @@ class ModelEvaluation:
         )
         pred_tokens = map(
             lambda tok: ["[CLS]"] + tok + ["[SEP]"], pred_tokens)
-        pred_token_ids = list(
-            map(
+        pred_token_ids = map(
                 Definition.get_tokenizer().convert_tokens_to_ids,
                 pred_tokens
             )
-        )
 
         pred_token_ids = map(
-            lambda token_ids: token_ids
-            + [0] * (data.max_sequence_length - len(token_ids)),
+            lambda token_ids: token_ids + [0] * (
+                    data.max_sequence_length - len(token_ids)
+            ),
             pred_token_ids
         )
         pred_token_ids = np.array(list(pred_token_ids))
@@ -187,11 +191,115 @@ class ModelEvaluation:
         predictions = bert_model.predict(pred_token_ids).argmax(
             axis=-1)
 
-        for utterance, intent in zip(
+        regression_test_records = list()
+        for text, expected_label, label in zip(
                 ExternalDatasets.regression_data[
                     TextProcessor.data_column_title
                 ],
+                ExternalDatasets.regression_data[
+                    TextProcessor.label_column_title
+                ],
                 predictions
         ):
-            print("utterance:", utterance, "\nintent:",
-                  ExternalDatasets.all_intents()[intent])
+            actual_label = ExternalDatasets.all_intents()[
+                label
+            ]
+            match = expected_label == actual_label
+            regression_test_records.append(
+                {
+                    "text": text,
+                    "expected_label": expected_label,
+                    "actual_label": actual_label,
+                    "match": match
+                }
+            )
+
+        cls.regression_test_records = regression_test_records
+
+        return None
+
+    @classmethod
+    def create_regression_test_results_csv(cls) -> None:
+        """
+
+        :return:
+        :rtype:
+        """
+
+        regression_test_results_csv_path = os.path.join(
+            WoodgateSettings.evaluation_summary_dir,
+            "regression_test_results.csv"
+        )
+
+        regression_test_results_df = pd.DataFrame.from_records(
+            data=cls.regression_test_records
+        )
+
+        regression_test_results_csv = regression_test_results_df\
+            .to_csv(index=False)
+
+        with open(
+                regression_test_results_csv_path,
+                "w+"
+        ) as file:
+            file.write(regression_test_results_csv)
+
+        return None
+
+    @classmethod
+    def create_regression_test_results_json(cls) -> None:
+        """
+
+        :return:
+        :rtype:
+        """
+
+        regression_test_results = {
+            "results": cls.regression_test_records
+        }
+
+        regression_test_results_json_path = os.path.join(
+            WoodgateSettings.evaluation_summary_dir,
+            "regressionTestResults.json"
+        )
+
+        with open(
+                regression_test_results_json_path,
+                "w+"
+        ) as file:
+            file.write(json.dumps(regression_test_results))
+
+        return None
+
+    @classmethod
+    def create_regression_test_results_pie_chart(cls) -> None:
+        """
+
+        :return:
+        :rtype:
+        """
+        regression_test_results = pd.DataFrame.from_records(
+            data=cls.regression_test_records
+        )
+
+        sizes = regression_test_results.match.value_counts(
+            normalize=True
+        )
+
+        # Plot 1
+        fig, axs = plt.subplots()
+        axs.title.set_text("Regression Test Results")
+        axs.pie(
+            sizes.tolist(),
+            labels=sizes.index.tolist()
+        )
+        plt.tight_layout()
+        plt.savefig(
+            os.path.join(
+                WoodgateSettings.evaluation_summary_dir,
+                "regression_test_results.png"
+            )
+        )
+        plt.clf()
+
+        return None

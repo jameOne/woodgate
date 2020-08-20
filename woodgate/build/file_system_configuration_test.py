@@ -5,16 +5,15 @@ tests related to the file_system_configuration.py module.
 """
 import os
 import shutil
-import datetime
-from uuid import UUID
 import unittest
 from .file_system_configuration import FileSystemConfiguration
+from ..woodgate_settings import WoodgateSettings
 
 
 class TestFileSystemConfigurationDefaults(unittest.TestCase):
     """
-    FileSystemConfigurationDefaultsTest - This class encapsulates
-    all logic related to unit testing the
+    FileSystemConfigurationDefaultsTest - This class
+    encapsulates all logic related to unit testing the
     FileSystemConfiguration class using default file
     system configuration.
     """
@@ -38,36 +37,33 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         )
         shutil.rmtree(woodgate_base_dir)
 
+    def test_attrs(self):
+        """
+
+        :return:
+        :rtype:
+        """
+        file_system_configuration = FileSystemConfiguration(
+            woodgate_settings=WoodgateSettings
+        )
+
+        attrs = list()
+
+        for attr, val in file_system_configuration\
+                .__dict__.items():
+            if attr[0] != "_":
+                attrs.append(attr)
+
+        self.assertEqual(len(attrs), 15)
+
     def test_default_values(self) -> None:
         """
 
         :return:
         :rtype:
         """
-        # the following will throw if the model_name is not a
-        # valid UUID which is virtually equivalent to an
-        # assertion.
-        UUID(FileSystemConfiguration.model_name, version=4)
-        self.assertTrue(
-            type(
-                datetime.datetime.strptime(
-                    FileSystemConfiguration.build_version,
-                    "%Y_%m_%d-%H:%M:%S"
-                )
-            ),
-            type(datetime.datetime.now())
-        )
-
-        # make sure create dataset visuals attr has a value
-        self.assertEqual(
-            FileSystemConfiguration.create_dataset_visuals,
-            1
-        )
-
-        # make sure create build visuals attr has a value
-        self.assertEqual(
-            FileSystemConfiguration.create_build_visuals,
-            1
+        file_system_configuration = FileSystemConfiguration(
+            woodgate_settings=WoodgateSettings
         )
 
         exp_woodgate_base_dir = os.path.join(
@@ -77,7 +73,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
 
         # make sure woodgate base dir attr has a value.
         self.assertEqual(
-            FileSystemConfiguration.woodgate_base_dir,
+            file_system_configuration.woodgate_base_dir,
             exp_woodgate_base_dir
         )
 
@@ -96,7 +92,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
 
         # make sure woodgate base dir has a directory for data
         self.assertEqual(
-            FileSystemConfiguration.data_dir,
+            file_system_configuration.data_dir,
             exp_data_dir
         )
 
@@ -115,7 +111,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
 
         # make sure output dir has a directory for data
         self.assertEqual(
-            FileSystemConfiguration.output_dir,
+            file_system_configuration.output_dir,
             exp_output_dir
         )
 
@@ -129,12 +125,12 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
 
         exp_build_dir = os.path.join(
             exp_output_dir,
-            FileSystemConfiguration.build_version
+            WoodgateSettings.build_version
         )
 
         # make sure build dir has a directory for data
         self.assertEqual(
-            FileSystemConfiguration.build_dir,
+            file_system_configuration.build_dir,
             exp_build_dir
         )
 
@@ -148,13 +144,13 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
 
         exp_model_build_dir = os.path.join(
             exp_build_dir,
-            FileSystemConfiguration.model_name
+            WoodgateSettings.model_name
         )
 
         # make sure model build dir has a directory for the
         # specific model version
         self.assertEqual(
-            FileSystemConfiguration.model_build_dir,
+            file_system_configuration.model_build_dir,
             exp_model_build_dir,
         )
 
@@ -168,13 +164,13 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
 
         exp_model_data_dir = os.path.join(
             exp_data_dir,
-            FileSystemConfiguration.model_name
+            WoodgateSettings.model_name
         )
 
         # make sure model data dir has a directory for the
         # specific model version
         self.assertEqual(
-            FileSystemConfiguration.model_data_dir,
+            file_system_configuration.model_data_dir,
             exp_model_data_dir,
         )
 
@@ -189,13 +185,13 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         exp_log_dir = os.path.join(
             exp_output_dir,
             "log",
-            FileSystemConfiguration.build_version
+            WoodgateSettings.build_version
         )
 
         # make sure log dir has a directory for the
         # specific model version
         self.assertEqual(
-            FileSystemConfiguration.log_dir,
+            file_system_configuration.log_dir,
             exp_log_dir,
         )
 
@@ -207,24 +203,6 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
             )
         )
 
-        exp_log_file = \
-            f"{FileSystemConfiguration.build_version}.log"
-
-        # make sure there is a value for log file
-        self.assertEqual(
-            FileSystemConfiguration.log_file,
-            exp_log_file
-        )
-
-        # make sure there is a value for log path
-        self.assertEqual(
-            FileSystemConfiguration.log_path,
-            os.path.join(
-                exp_log_dir,
-                exp_log_file
-            )
-        )
-
         exp_training_dir = os.path.join(
             exp_model_data_dir,
             "train"
@@ -233,7 +211,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         # make sure training dir has a directory for the
         # specific model version
         self.assertEqual(
-            FileSystemConfiguration.training_dir,
+            file_system_configuration.training_dir,
             exp_training_dir,
         )
 
@@ -245,23 +223,6 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
             )
         )
 
-        exp_training_file = "train.csv"
-
-        # make sure there is a value for training file
-        self.assertEqual(
-            FileSystemConfiguration.training_file,
-            exp_training_file
-        )
-
-        # make sure there is a value for training path
-        self.assertEqual(
-            FileSystemConfiguration.training_path,
-            os.path.join(
-                exp_training_dir,
-                exp_training_file
-            )
-        )
-
         exp_testing_dir = os.path.join(
             exp_model_data_dir,
             "test"
@@ -270,7 +231,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         # make sure testing dir has a directory for the
         # specific model version
         self.assertEqual(
-            FileSystemConfiguration.testing_dir,
+            file_system_configuration.testing_dir,
             exp_testing_dir,
         )
 
@@ -282,23 +243,6 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
             )
         )
 
-        exp_testing_file = "test.csv"
-
-        # make sure there is a value for testing file
-        self.assertEqual(
-            FileSystemConfiguration.testing_file,
-            exp_testing_file
-        )
-
-        # make sure there is a value for testing path
-        self.assertEqual(
-            FileSystemConfiguration.testing_path,
-            os.path.join(
-                exp_testing_dir,
-                exp_testing_file
-            )
-        )
-
         exp_evaluation_dir = os.path.join(
             exp_model_data_dir,
             "evaluate"
@@ -307,7 +251,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         # make sure evaluation dir has a directory for the
         # specific model version
         self.assertEqual(
-            FileSystemConfiguration.evaluation_dir,
+            file_system_configuration.evaluation_dir,
             exp_evaluation_dir,
         )
 
@@ -319,23 +263,6 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
             )
         )
 
-        exp_evaluation_file = "evaluate.csv"
-
-        # make sure there is a value for evaluation file
-        self.assertEqual(
-            FileSystemConfiguration.evaluation_file,
-            exp_evaluation_file
-        )
-
-        # make sure there is a value for evaluation path
-        self.assertEqual(
-            FileSystemConfiguration.evaluation_path,
-            os.path.join(
-                exp_evaluation_dir,
-                exp_evaluation_file
-            )
-        )
-
         exp_regression_dir = os.path.join(
             exp_model_data_dir,
             "regress"
@@ -344,7 +271,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         # make sure regression dir has a directory for the
         # specific model version
         self.assertEqual(
-            FileSystemConfiguration.regression_dir,
+            file_system_configuration.regression_dir,
             exp_regression_dir,
         )
 
@@ -356,23 +283,6 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
             )
         )
 
-        exp_regression_file = "regress.csv"
-
-        # make sure there is a value for regression file
-        self.assertEqual(
-            FileSystemConfiguration.regression_file,
-            exp_regression_file
-        )
-
-        # make sure there is a value for regression path
-        self.assertEqual(
-            FileSystemConfiguration.regression_path,
-            os.path.join(
-                exp_regression_dir,
-                exp_regression_file
-            )
-        )
-
         exp_datasets_summary_dir = os.path.join(
             exp_build_dir,
             "datasets_summary"
@@ -381,7 +291,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         # make sure there is a value for datasets summary
         # directory
         self.assertEqual(
-            FileSystemConfiguration.datasets_summary_dir,
+            file_system_configuration.datasets_summary_dir,
             exp_datasets_summary_dir
         )
 
@@ -401,7 +311,7 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         # make sure there is a value for bert
         # directory
         self.assertEqual(
-            FileSystemConfiguration.bert_dir,
+            file_system_configuration.bert_dir,
             exp_bert_dir
         )
 
@@ -410,57 +320,6 @@ class TestFileSystemConfigurationDefaults(unittest.TestCase):
         self.assertTrue(
             os.path.isdir(
                 exp_bert_dir
-            )
-        )
-
-        exp_bert_config_file = "bert_config.json"
-
-        # make sure there is a value for bert config
-        self.assertEqual(
-            FileSystemConfiguration.bert_config_file,
-            exp_bert_config_file
-        )
-
-        # make sure there is a value for bert config path
-        self.assertEqual(
-            FileSystemConfiguration.bert_config_path,
-            os.path.join(
-                exp_bert_dir,
-                exp_bert_config_file
-            )
-        )
-
-        exp_bert_model_file = "bert_model.ckpt"
-
-        # make sure there is a value for bert model
-        self.assertEqual(
-            FileSystemConfiguration.bert_model_file,
-            exp_bert_model_file
-        )
-
-        # make sure there is a value for bert model path
-        self.assertEqual(
-            FileSystemConfiguration.bert_model_path,
-            os.path.join(
-                exp_bert_dir,
-                exp_bert_model_file
-            )
-        )
-
-        exp_bert_vocab_file = "vocab.txt"
-
-        # make sure there is a value for bert vocab file
-        self.assertEqual(
-            FileSystemConfiguration.bert_vocab_file,
-            exp_bert_vocab_file
-        )
-
-        # make sure there is a value for bert vocab path
-        self.assertEqual(
-            FileSystemConfiguration.bert_vocab_path,
-            os.path.join(
-                exp_bert_dir,
-                exp_bert_vocab_file
             )
         )
 

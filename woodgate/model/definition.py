@@ -11,8 +11,8 @@ import tensorflow as tf
 from tensorflow import keras
 from bert import BertModelLayer
 from bert.tokenization.bert_tokenization import FullTokenizer
-from ..build.file_system_configuration import \
-    FileSystemConfiguration
+from ..woodgate_settings import WoodgateSettings
+from ..transfer.bert_model_parameters import BertModelParameters
 
 
 class Definition:
@@ -25,13 +25,13 @@ class Definition:
     def get_tokenizer() -> FullTokenizer:
         """This method will return a BERT tokenizer initialized
         using the vocabulary file at
-        `FileSystemConfiguration.bert_vocab_path`.
+        `WoodgateSettings.bert_vocab_path`.
 
         :return: A BERT tokenizer.
         :rtype: FullTokenizer
         """
         tokenizer: FullTokenizer = FullTokenizer(
-            vocab_file=FileSystemConfiguration.bert_vocab_path
+            vocab_file=WoodgateSettings.get_bert_vocab_path()
         )
         return tokenizer
 
@@ -55,7 +55,7 @@ class Definition:
         """
 
         with tf.io.gfile.GFile(
-                FileSystemConfiguration.bert_config_path
+                WoodgateSettings.get_bert_config_path()
         ) as reader:
             bc = StockBertConfig.from_json_string(reader.read())
             bert_params = map_stock_config_to_params(bc)
@@ -76,7 +76,9 @@ class Definition:
             lambda seq: seq[:, 0, :])(bert_output)
         cls_out = keras.layers.Dropout(0.5)(cls_out)
         logits = keras.layers.Dense(
-            units=768, activation="tanh")(cls_out)
+            units=BertModelParameters().bert_h_param,
+            activation="tanh"
+        )(cls_out)
         logits = keras.layers.Dropout(0.5)(logits)
         logits = keras.layers.Dense(
             units=number_of_intents, activation="softmax")(logits)
@@ -87,7 +89,7 @@ class Definition:
 
         load_stock_weights(
             bert,
-            FileSystemConfiguration.bert_model_path
+            WoodgateSettings.get_bert_model_path()
         )
 
         return model

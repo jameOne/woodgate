@@ -3,7 +3,7 @@ bert_model_parameters.py - This module contains the
 BertModelParameters class definition
 """
 import os
-from typing import List
+from typing import List, Union
 
 
 class BertModelParameters:
@@ -35,16 +35,23 @@ class BertModelParameters:
     #: BERT.
     ALLOWED_A_VALUES: List[int] = [2, 4, 8, 12, 16]
 
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            bert_l_param: int = None,
+            bert_h_param: int = None
+    ) -> None:
         #: The `bert_l_param` attribute represents the number of
         #: stacked encoders used for the BERT model. This
         #: attribute is set via the `BERT_L_PARAM`
-        self.bert_l_param: int = int(
-            os.getenv(
-                "BERT_L_PARAM",
-                "12"
+        if bert_l_param is None:
+            self.bert_l_param: int = int(
+                os.getenv(
+                    "BERT_L_PARAM",
+                    "2"
+                )
             )
-        )
+        else:
+            self.bert_l_param = bert_l_param
 
         if self.bert_l_param not in self.ALLOWED_L_VALUES:
             raise ValueError(
@@ -53,12 +60,15 @@ class BertModelParameters:
                 + "6, 8, 10, 12, or 24"
             )
 
-        self.bert_h_param: int = int(
-            os.getenv(
-                "BERT_H_PARAM",
-                "768"
+        if bert_h_param is None:
+            self.bert_h_param: int = int(
+                os.getenv(
+                    "BERT_H_PARAM",
+                    "128"
+                )
             )
-        )
+        else:
+            self.bert_h_param = bert_h_param
 
         if self.bert_h_param == self.ALLOWED_H_VALUES[0]:
             self.bert_a_param = 2

@@ -24,10 +24,7 @@ Welcome to Woodgate's documentation!
 .. automodule:: woodgate.build.file_system_configuration
     :members:
 
-.. automodule:: woodgate.build.sanity_check
-    :members:
-
-.. automodule:: woodgate.transfer.bert_model
+.. automodule:: woodgate.transfer.bert_model_parameters
     :members:
 
 .. automodule:: woodgate.transfer.bert_retrieval_strategy
@@ -53,10 +50,6 @@ Welcome to Woodgate's documentation!
 
 .. automodule:: woodgate.model.storage_strategy
     :members:
-
-.. automodule:: woodgate.model.model_summary
-    :members:
-
 
 Indices and tables
 ==================
