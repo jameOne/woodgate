@@ -126,15 +126,9 @@ class ExternalDatasets:
         :return: A list of unique intents found in training data.
         :rtype: List[str]
         """
-        training_intents_list = list()
-        try:
-            training_intents_list = sorted(
-                cls.get_training_data()["intent"]
-                .unique().tolist()
-            )
-        except KeyError as err:
-            WoodgateLogger.logger.error(err)
-        return training_intents_list
+        return sorted(
+            cls.get_training_data().intent.unique().tolist()
+        )
 
     #: The `training_set` attribute represents a set
     #: of unique intents found in the `training_data`.
