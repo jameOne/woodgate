@@ -40,6 +40,16 @@ class WoodgateProcess:
         :return: None
         :rtype: NoneType
         """
+
+        """
+        Step 1 - Startup
+        The first stage of the build process involves:
+            1) Record the start time used to determine the
+            duration of the build according to a wall clock.
+            2) Initialize the file system such that all
+            directories which are assumed to exist
+        """
+
         start_time = datetime.datetime.now()
 
         WoodgateLogger.logger.info(

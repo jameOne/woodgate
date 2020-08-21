@@ -50,16 +50,16 @@ class ModelEvaluation:
         accuracy respectively.
         :rtype: Tuple[Any, Any]
         """
-        _, train_acc = bert_model.evaluate(
+        train = bert_model.evaluate(
             data.train_x,
             data.train_y
         )
-        _, test_acc = bert_model.evaluate(
+        test = bert_model.evaluate(
             data.test_x,
             data.test_y
         )
 
-        return train_acc, test_acc
+        return train, test
 
     @staticmethod
     def create_classification_report(

@@ -165,14 +165,14 @@ class BertRetrievalStrategy:
         ):
             process = subprocess.Popen(
                 [
-                    'wget',
+                    'curl',
                     self.bert_zip_url
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
             stdout, stderr = process.communicate()
-            WoodgateLogger.logger.info(stdout)
+            # WoodgateLogger.logger.info(stdout)
             WoodgateLogger.logger.error(stderr)
 
             os.makedirs(
@@ -191,7 +191,7 @@ class BertRetrievalStrategy:
                 stderr=subprocess.PIPE
             )
             stdout, stderr = process.communicate()
-            WoodgateLogger.logger.info(stdout)
+            # WoodgateLogger.logger.info(stdout)
             WoodgateLogger.logger.error(stderr)
 
             process = subprocess.Popen(
@@ -203,7 +203,7 @@ class BertRetrievalStrategy:
                 stderr=subprocess.PIPE
             )
             stdout, stderr = process.communicate()
-            WoodgateLogger.logger.info(stdout)
+            # WoodgateLogger.logger.info(stdout)
             WoodgateLogger.logger.error(stderr)
 
         return None

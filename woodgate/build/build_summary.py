@@ -100,8 +100,12 @@ class BuildSummary:
         :rtype:
         """
         acc_over_epochs_dict = {
-            "acc": build_history.history['acc'],
-            "valLoss": build_history.history['val_acc'],
+            "accuracy": build_history.history[
+                'sparse_categorical_crossentropy'
+            ],
+            "valAccuracy": build_history.history[
+                'val_sparse_categorical_crossentropy'
+            ],
             "title": 'Accuracy over training epochs',
             "yLabel": 'Accuracy',
             "xLabel": 'Epoch',
@@ -141,8 +145,10 @@ class BuildSummary:
         ax = plt.figure().gca()
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-        ax.plot(build_history.history['acc'])
-        ax.plot(build_history.history['val_acc'])
+        ax.plot(build_history.history[
+                    'sparse_categorical_crossentropy'])
+        ax.plot(build_history.history[
+                    'val_sparse_categorical_crossentropy'])
         plt.ylabel('Accuracy')
         plt.xlabel('Epoch')
         plt.legend(['train', 'test'])

@@ -57,12 +57,14 @@ class Definition:
         with tf.io.gfile.GFile(
                 WoodgateSettings.get_bert_config_path()
         ) as reader:
-            bc = StockBertConfig.from_json_string(reader.read())
+            bc = StockBertConfig.from_json_string(
+                reader.read()
+            )
             bert_params = map_stock_config_to_params(bc)
             bert_params.adapter_size = None
             bert = BertModelLayer.from_params(
                 bert_params,
-                name="bert"
+                name=WoodgateSettings.model_name
             )
 
         input_ids = keras.layers.Input(
@@ -72,19 +74,27 @@ class Definition:
         )
         bert_output = bert(input_ids)
 
-        cls_out = keras.layers.Lambda(
+        clf_out = keras.layers.Lambda(
             lambda seq: seq[:, 0, :])(bert_output)
-        cls_out = keras.layers.Dropout(0.5)(cls_out)
+        clf_out = keras.layers.Dropout(
+            WoodgateSettings.clf_out_dropout_rate
+        )(clf_out)
         logits = keras.layers.Dense(
             units=BertModelParameters().bert_h_param,
-            activation="tanh"
-        )(cls_out)
-        logits = keras.layers.Dropout(0.5)(logits)
+            activation=WoodgateSettings.clf_out_activation
+        )(clf_out)
+        logits = keras.layers.Dropout(
+            WoodgateSettings.logits_dropout_rate
+        )(logits)
         logits = keras.layers.Dense(
-            units=number_of_intents, activation="softmax")(logits)
+            units=number_of_intents,
+            activation=WoodgateSettings.logits_activation
+        )(logits)
 
         model: keras.Model = keras.Model(
-            inputs=input_ids, outputs=logits)
+            inputs=input_ids,
+            outputs=logits
+        )
         model.build(input_shape=(None, max_sequence_length))
 
         load_stock_weights(

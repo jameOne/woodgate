@@ -198,14 +198,14 @@ class TestModelEvaluation(unittest.TestCase):
 
         self.assertIsNotNone(test_report)
 
-        train_acc, test_acc = \
+        train, test = \
             ModelEvaluation.evaluate_model_accuracy(
                 test_model,
                 data
             )
 
-        self.assertEqual(type(train_acc), type(0.0))
-        self.assertEqual(type(test_acc), type(0.0))
+        self.assertEqual(type(train), type(list()))
+        self.assertEqual(type(test), type(list()))
 
         ModelEvaluation\
             .create_regression_test_results_pie_chart()

@@ -3,8 +3,10 @@ woodgate_settings.py - The woodgate_settings.py module contains
 the WoodgateSettings class definition.
 """
 import os
+import ast
 import uuid
 import datetime
+from typing import List, Any
 
 
 class WoodgateSettings:
@@ -477,11 +479,13 @@ class WoodgateSettings:
     )
 
     #: The `validation_split` attribute represents a decimal
-    #: number between 0 and 1. This value indicates
-    #: the proportional split of your training set by the
-    #: value of the variable. For example, a value of
-    #: `VALIDATION_SPLIT=0.2` would signal the program to
-    #: reserve 20% of the training set for validation testing
+    #: number between 0 and 1. This attribute is set via the
+    #: `VALIDATION_SPLIT` environment variable.
+    #: Validation split indicates the proportional split of your
+    #: training set by the value of the variable.
+    #: For example, a value of `VALIDATION_SPLIT=0.2`
+    #: would signal the program to reserve 20% of the
+    #: training set for validation testing
     #: completed after each training epoch. If the
     #: `VALIDATION_SPLIT` environment variable is not set,
     #: then the `validation_split` attribute will default to
@@ -502,13 +506,169 @@ class WoodgateSettings:
     )
 
     #: The `epochs` attribute represents an integer between
-    #: 1-1000 inclusive. This value indicates the number of
+    #: 1-1000 inclusive.
+    #: This attribute is set via the `EPOCHS` environment
+    #: variable. This value indicates the number of
     #: times the training algorithm will iterate over the
     #: training dataset before completing. If the `EPOCHS`
     #: environment variable is unset, then the `epochs`
     #: attribute will default to `5`.
     epochs: int = int(
         os.getenv("EPOCHS", "1")
+    )
+
+    #: The `clf_out_dropout_rate` attribute represents one
+    #: of two (1 / 2) dropout rates which may be customized.
+    #: Typically this value should be around `0.5`. This
+    #: attribute is set via the `CLF_OUT_DROPOUT_RATE`
+    #: environment variable. If the `CLF_OUT_DROPOUT_RATE`
+    #: environment variable is not set, then the
+    #: `clf_out_dropout_rate` defaults to `0.5`.
+    clf_out_dropout_rate: float = float(
+        os.getenv(
+            "CLF_OUT_DROPOUT_RATE",
+            "0.5"
+        )
+    )
+
+    #: The `clf_out_activation` attribute represents one
+    #: of two (1 / 2) activation functions which may be
+    #: customized. This attribute is set via the
+    #: `CLF_OUT_ACTIVATION` environment variable. If the
+    #: `CLF_OUT_ACTIVATION` environment variable is not set,
+    #: then the `clf_out_activation` defaults to `tanh`.
+    clf_out_activation: str = os.getenv(
+        "CLF_OUT_ACTIVATION",
+        "tanh"
+    )
+
+    #: The `logits_dropout_rate` attribute represents two
+    #: of two (2 / 2) dropout rates which may be customized.
+    #: Typically this value should be around `0.5`. This
+    #: attribute is set via the `LOGITS_DROPOUT_RATE`
+    #: environment variable. If the `LOGITS_DROPOUT_RATE`
+    #: environment variable is not set, then the
+    #: `logits_dropout_rate` defaults to `0.5`.
+    logits_dropout_rate: float = float(
+        os.getenv(
+            "LOGITS_DROPOUT_RATE",
+            "0.5"
+        )
+    )
+
+    #: The `logits_activation` attribute represents two
+    #: of two (2 / 2) activation functions which may be
+    #: customized. This attribute is set via the
+    #: `LOGITS_ACTIVATION` environment variable. If the
+    #: `LOGITS_ACTIVATION` environment variable is not set,
+    #: then the `logits_activation` defaults to `tanh`.
+    logits_activation: str = os.getenv(
+        "LOGITS_ACTIVATION",
+        "softmax"
+    )
+
+    #: The `optimizer_name` attribute represents the optimization
+    #: algorithm employed by the compilation process. This
+    #: attribute is set via the `OPTIMIZER_NAME` environment
+    #: variable. If the `OPTIMIZER_NAME` environment variable is
+    #: not set, then the `optimizer_name` attribute defaults to
+    #: `Adam` representing the Adam optimizer.
+    #: The goal is to support all optimizers found in
+    #: `tf.keras.optimizers`. The name reference the default
+    #: name value. Thus, the best way to determine the value of
+    #: `OPTIMIZER_NAME` for a given optimizer is to refer to the
+    #: source module `tf.keras.optimizers` and find the class
+    #: definition of the desired optimizer and use the default
+    #: value of the `name` argument. The default values are
+    #: sufficient for most cases. The attribute is case
+    #: insensitive. USE WITH CAUTION!
+    optimizer_name: str = os.getenv(
+        "OPTIMIZER_NAME",
+        "Adam"
+    )
+
+    #: The `optimizer_learning_rate` attribute represents a
+    #: floating point value which represents the step size taken
+    #: by the optimization algorithm toward a minimum loss.
+    #: The `optimizer_learning_rate` attribute is set via the
+    #: `OPTIMIZER_LEARNING_RATE` environment variable
+    #: This value should be in the interval (0-1], otherwise a
+    #: ValueError will be thrown at run time.
+    optimizer_learning_rate: float = float(
+        os.getenv("OPTIMIZER_LEARNING_RATE", "1e-5")
+    )
+
+    #: The `optimizer_args` attribute represents the additional
+    #: arguments that may be passed to the selected optimizer.
+    #: It is up to the user to know the order of additional
+    #: optimizer argument, and which optimizer requires which
+    #: values. If additional arguments are not required, then
+    #: this attribute will not effect the instantiation of the
+    #: requested optimizer. In general these should be a comma
+    #: separated list of floating point (decimal) number enclosed
+    #: in square brackets.
+    optimizer_args: List[float] = ast.literal_eval(
+        os.getenv(
+            "OPTIMIZER_ARGS",
+            "[]"
+        )
+    )
+
+    #: The `loss_name` attribute represents the optimization
+    #: algorithm employed by the compilation process. This
+    #: attribute is set via the `LOSS_NAME` environment
+    #: variable. If the `LOSS_NAME` environment variable is
+    #: not set, then the `loss_name` attribute defaults to
+    #: `Sparse_Categorical_Crossentropy` representing the
+    #: Sparse Categorical Crossentropy loss algorithm.
+    #: The goal is to support all losses found in
+    #: `tf.keras.losses`. The name reference the default
+    #: name value. Thus, the best way to determine the value of
+    #: `LOSS_NAME` for a given loss is to refer to the
+    #: source module `tf.keras.losses` and find the class
+    #: definition of the desired loss and use the default
+    #: value of the `name` argument. The default values are
+    #: sufficient for most cases. The attribute is case
+    #: insensitive. USE WITH CAUTION!
+    loss_name: str = os.getenv(
+        "LOSS_NAME",
+        "Sparse_Categorical_Crossentropy"
+    )
+
+    #: The `loss_args` attribute represents the additional
+    #: arguments that may be passed to the selected optimizer.
+    #: It is up to the user to know the order of additional
+    #: optimizer argument, and which optimizer requires which
+    #: values. If additional arguments are not required, then
+    #: this attribute will not effect the instantiation of the
+    #: requested optimizer. In general these should be a comma
+    #: separated list of floating point (decimal) number
+    #: enclosed in square brackets.
+    loss_args: List[Any] = ast.literal_eval(
+        os.getenv(
+            "LOSS_ARGS",
+            "[True]"
+        )
+    )
+
+    #: The `optimizer_metrics` attribute represents the
+    #: metrics recorded during evaluation of the model.
+    #: This attribute is
+    #: In general these should be a comma separated list of
+    #: strings (text) enclosed in square brackets; for each loss
+    #: function there (usually) exists a corresponding metric.
+    #: Thus, the best way to determine the value of
+    #: `OPTIMIZER_METRICS` for a given loss is to
+    #: refer to the source module `tf.keras.losses` and find the
+    #: class definition of the desired metric and use the default
+    #: value of the `name` argument. The default values are
+    #: sufficient for most cases. The list items are case
+    #: insensitive. USE WITH CAUTION!
+    optimizer_metrics: List[str] = ast.literal_eval(
+        os.getenv(
+            "OPTIMIZER_METRICS",
+            "['Sparse_Categorical_Crossentropy']"
+        )
     )
 
     @classmethod

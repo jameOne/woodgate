@@ -2,8 +2,11 @@
 compiler.py - The compiler.py module contains the Compiler class
 definition.
 """
-import os
 from tensorflow import keras
+from ..factories.optimizer_factory import OptimizerFactory
+from ..factories.loss_factory import LossFactory
+from ..factories.metrics_factory import MetricsFactory
+from ..woodgate_settings import WoodgateSettings
 
 
 class Compiler:
@@ -12,15 +15,8 @@ class Compiler:
     compiling the model.
     """
 
-    #: The `learning_rate` attribute represents a floating
-    #: point value which represents the step size taken by
-    #: the optimization algorithm toward a minimum loss. This
-    #: value should be in the interval (0-1], otherwise a
-    #: ValueError will be thrown at run time.
-    learning_rate = float(os.getenv("LEARNING_RATE", "1e-5"))
-
-    @classmethod
-    def compile(cls, bert_model: keras.Model) -> None:
+    @staticmethod
+    def compile(bert_model: keras.Model) -> None:
         # TODO - Open a number of options for loss, optimizer,
         #  and metrics.
         """This method will call the `compile` method on the
@@ -33,19 +29,25 @@ class Compiler:
         :return: None
         :rtype: NoneType
         """
+        optimizer = OptimizerFactory.get_optimizer(
+            WoodgateSettings.optimizer_name,
+            WoodgateSettings.optimizer_learning_rate,
+            *WoodgateSettings.optimizer_args
+        )
+
+        loss = LossFactory.get_loss(
+            WoodgateSettings.loss_name,
+            *WoodgateSettings.loss_args
+        )
+
+        metrics = MetricsFactory.get_metrics(
+            WoodgateSettings.optimizer_metrics
+        )
 
         bert_model.compile(
-            optimizer=keras.optimizers.Adam(
-                learning_rate=cls.learning_rate
-            ),
-            loss=keras.losses.SparseCategoricalCrossentropy(
-                from_logits=True
-            ),
-            metrics=[
-                keras.metrics.SparseCategoricalAccuracy(
-                    name="acc"
-                )
-            ]
+            optimizer=optimizer,
+            loss=loss,
+            metrics=metrics
         )
 
         return None

@@ -20,14 +20,8 @@ class TestCompiler(unittest.TestCase):
         :return:
         :rtype:
         """
-        self.assertEqual(
-            Compiler.learning_rate,
-            1e-5
-        )
 
-        compiled_model = Compiler.compile(keras.Model())
-
-        self.assertIsNone(compiled_model)
+        self.assertIsNone(Compiler.compile(keras.Model()))
 
 
 if __name__ == '__main__':

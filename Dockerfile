@@ -1,24 +1,21 @@
 FROM tensorflow/tensorflow:latest-gpu
 
-COPY additional_requirements.txt /home/james/additional_requirements.txt
+RUN useradd -ms /bin/bash  james
+
+COPY additional_requirements.txt \
+    /home/james/additional_requirements.txt
 
 WORKDIR /home/james
 
 RUN pip install --upgrade pip \
-    && pip install -r additional_requirements.txt
+    && pip install -r additional_requirements.txt \
+    && mkdir build
 
-RUN mkdir build
 
-COPY woodgate ./build
-
-ENV MPLCONFIGDIR=/home/james/build/output
+ENV MPLCONFIGDIR=/home/james/build
 
 WORKDIR /home/james/build
 
-CMD ["python", "main.py"]
+COPY . ./
 
-#RUN python woodgate_process.py
-#
-#FROM tensorflow/serving:latest-gpu
-#
-#COPY ./models/bert /models/bert
+CMD ["python", "main.py"]

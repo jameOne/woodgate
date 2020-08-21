@@ -1,0 +1,6 @@
+woodgate/**/*test.py
+.mypy_cache
+.pytest_cache
+docs/
+htmlcov/
+.coverage*
