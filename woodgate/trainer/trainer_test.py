@@ -1,5 +1,5 @@
 """
-fitter_test.py - The fitter_test.py module contains all
+model_training_test.py - The model_training_test.py module contains all
 unit tests related to the woodgate.model.fitter module.
 """
 import os
@@ -9,15 +9,15 @@ import shutil
 import pandas as pd
 from ..build.file_system_configuration import \
     FileSystemConfiguration
-from ..woodgate_settings import WoodgateSettings
-from ..transfer.bert_model_parameters import BertModelParameters
-from ..transfer.bert_retrieval_strategy import \
+from woodgate.woodgate_settings import WoodgateSettings
+from woodgate.transfer.bert_model_parameters import BertModelParameters
+from woodgate.transfer.bert_retrieval_strategy import \
     BertRetrievalStrategy
-from ..tuning.external_datasets import ExternalDatasets
-from ..tuning.text_processor import TextProcessor
-from ..model.definition import Definition
-from .compiler import Compiler
-from .fitter import Fitter
+from woodgate.tuning.external_datasets import ExternalDatasets
+from woodgate.preprocessor.preprocessor import Preprocessor
+from woodgate.model.definition import Definition
+from woodgate.compiler.compiler import Compiler
+from .model_training import Fitter
 
 
 class TestFitter(unittest.TestCase):
@@ -125,7 +125,7 @@ class TestFitter(unittest.TestCase):
             file.write(test.to_csv(index_label=False))
         ExternalDatasets.set_regression_data()
 
-        data = TextProcessor(
+        data = Preprocessor(
             test,
             test,
             Definition.get_tokenizer(),
@@ -208,7 +208,7 @@ class TestFitter(unittest.TestCase):
             file.write(test.to_csv(index_label=False))
         ExternalDatasets.set_regression_data()
 
-        data = TextProcessor(
+        data = Preprocessor(
             test,
             test,
             Definition.get_tokenizer(),

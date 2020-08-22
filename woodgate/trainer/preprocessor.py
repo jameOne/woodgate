@@ -1,19 +1,19 @@
 """
-text_processor.py - This text_processor.py module contains the
+preprocessor.py - This preprocessor.py module contains the
 TextPreprocessor class definition.
 """
 import os
-import tqdm
 import numpy as np
 from bert.tokenization.bert_tokenization import FullTokenizer
 
 
-class TextProcessor:
+class Preprocessor:
     """
-    TextProcessor - The TextProcessor class encapsulates logic
+    Preprocessor - The Preprocessor class encapsulates logic
     related to processing clean text (in CSV format) used to
     train BERT for intent detection.
     """
+
     data_column_title = os.getenv(
         "DATA_COLUMN_TITLE",
         "text"
@@ -27,18 +27,17 @@ class TextProcessor:
             self,
             train,
             test,
-            tokenizer: FullTokenizer,
+            vocab_file: str,
             intents,
-            max_sequence_length=128
+            max_sequence_length=128,
     ):
-        self.tokenizer = tokenizer
+        self.tokenizer = self.tokenizer_factory(vocab_file)
         self.max_sequence_length = 0
         self.intents = intents
         (
             (self.train_x, self.train_y),
             (self.test_x, self.test_y)
         ) = map(self._prepare, [train, test])
-        # print("max seq_len", self.max_sequence_length)
         self.max_sequence_length = min(
             self.max_sequence_length,
             max_sequence_length
@@ -50,10 +49,10 @@ class TextProcessor:
 
     def _prepare(self, df):
         x, y = [], []
-        for _, row in tqdm.tqdm(df.iterrows()):
+        for _, row in df.iterrows():
             text, label = \
-                row[TextProcessor.data_column_title], \
-                row[TextProcessor.label_column_title]
+                row[self.data_column_title], \
+                row[self.label_column_title]
             tokens = self.tokenizer.tokenize(text)
             tokens = ["[CLS]"] + tokens + ["[SEP]"]
             token_ids = self.tokenizer.convert_tokens_to_ids(
@@ -80,3 +79,17 @@ class TextProcessor:
             )
             x.append(np.array(input_ids))
         return np.array(x)
+
+    @staticmethod
+    def tokenizer_factory(vocab_file: str) -> FullTokenizer:
+        """This method will return a BERT tokenizer initialized
+        using the vocabulary file at
+        `WoodgateSettings.bert_vocab_path`.
+
+        :return: A BERT tokenizer.
+        :rtype: FullTokenizer
+        """
+        tokenizer: FullTokenizer = FullTokenizer(
+            vocab_file=vocab_file
+        )
+        return tokenizer
