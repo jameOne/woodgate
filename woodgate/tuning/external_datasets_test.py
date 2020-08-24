@@ -9,8 +9,7 @@ import unittest
 import pandas as pd
 import shutil
 from .external_datasets import ExternalDatasets
-from ..woodgate_settings import \
-    WoodgateSettings
+from ..woodgate_settings import Model, FileSystem, Build
 
 
 class TestExternalDatasetsDefaults(unittest.TestCase):
@@ -27,79 +26,50 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         :rtype:
         """
         ExternalDatasets()
-        os.makedirs(
-            os.path.dirname(
-                WoodgateSettings.get_training_path()
-            ),
-            exist_ok=True
-        )
+        model = Model("test")
+        build = Build()
+        file_system = FileSystem(model, build)
+        file_system.configure()
+        self.file_system = file_system
+
         with open(
-                WoodgateSettings.get_training_path(), "w+"
+                self.file_system.get_training_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
                 "testTrain,TestTrainIntent\n"
             ])
 
-        os.makedirs(
-            os.path.dirname(
-                WoodgateSettings.get_testing_path()
-            ),
-            exist_ok=True
-        )
         with open(
-                WoodgateSettings.get_testing_path(), "w+"
+                self.file_system.get_testing_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
                 "testTest,TestTestIntent\n"
             ])
 
-        os.makedirs(
-            os.path.dirname(
-                WoodgateSettings.get_evaluation_path()
-            ),
-            exist_ok=True
-        )
         with open(
-                WoodgateSettings.get_evaluation_path(), "w+"
+                self.file_system.get_evaluation_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
                 "testEvaluate,TestEvaluateIntent\n"
             ])
 
-        os.makedirs(
-            os.path.dirname(
-                WoodgateSettings.get_regression_path()
-            ),
-            exist_ok=True
-        )
         with open(
-                WoodgateSettings.get_regression_path(), "w+"
+                self.file_system.get_regression_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
                 "testRegress,TestRegressIntent\n"
             ])
 
-        os.makedirs(
-            WoodgateSettings.datasets_summary_dir,
-            exist_ok=True
-        )
-
     def tearDown(self) -> None:
         """
 
         :return:
-        :rtype:
         """
-        os.remove(WoodgateSettings.get_training_path())
-        os.remove(WoodgateSettings.get_testing_path())
-        os.remove(WoodgateSettings.get_evaluation_path())
-        os.remove(WoodgateSettings.get_regression_path())
-        shutil.rmtree(
-            WoodgateSettings.datasets_summary_dir)
+        # shutil.rmtree(self.file_system.woodgate_base_dir)
 
     def test_default_values(self) -> None:
         """
@@ -165,7 +135,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestTrainIntent"
             ]
         })
-        ExternalDatasets.set_training_data()
+        ExternalDatasets.set_training_data(self.file_system)
         training_data = ExternalDatasets.get_training_data()
         self.assertTrue(
             training_data.equals(
@@ -181,7 +151,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestTestIntent"
             ]
         })
-        ExternalDatasets.set_testing_data()
+        ExternalDatasets.set_testing_data(self.file_system)
         testing_data = ExternalDatasets.get_testing_data()
         self.assertTrue(
             testing_data.equals(
@@ -197,7 +167,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestEvaluateIntent"
             ]
         })
-        ExternalDatasets.set_evaluation_data()
+        ExternalDatasets.set_evaluation_data(self.file_system)
         evaluation_data = ExternalDatasets.get_evaluation_data()
         self.assertTrue(
             evaluation_data.equals(
@@ -213,7 +183,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestRegressIntent"
             ]
         })
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_regression_data(self.file_system)
         regression_data = ExternalDatasets.get_regression_data()
         self.assertTrue(
             regression_data.equals(
@@ -230,7 +200,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_training_intents_list = [
             "TestTrainIntent"
         ]
-        ExternalDatasets.set_training_data()
+        ExternalDatasets.set_training_data(self.file_system)
         self.assertListEqual(
             ExternalDatasets.training_intents_list(),
             exp_training_intents_list
@@ -239,7 +209,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_testing_intents_list = [
             "TestTestIntent"
         ]
-        ExternalDatasets.set_testing_data()
+        ExternalDatasets.set_testing_data(self.file_system)
         self.assertListEqual(
             ExternalDatasets.testing_intents_list(),
             exp_testing_intents_list
@@ -248,7 +218,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_evaluation_intents_list = [
             "TestEvaluateIntent"
         ]
-        ExternalDatasets.set_evaluation_data()
+        ExternalDatasets.set_evaluation_data(self.file_system)
         self.assertListEqual(
             ExternalDatasets.evaluation_intents_list(),
             exp_evaluation_intents_list
@@ -257,7 +227,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_regression_intents_list = [
             "TestRegressIntent"
         ]
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_regression_data(self.file_system)
         self.assertListEqual(
             ExternalDatasets.regression_intents_list(),
             exp_regression_intents_list
@@ -272,7 +242,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_training_intents_set = {
             "TestTrainIntent"
         }
-        ExternalDatasets.set_training_data()
+        ExternalDatasets.set_training_data(self.file_system)
         self.assertSetEqual(
             ExternalDatasets.training_intents_set(),
             exp_training_intents_set
@@ -281,7 +251,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_testing_intents_set = {
             "TestTestIntent"
         }
-        ExternalDatasets.set_testing_data()
+        ExternalDatasets.set_testing_data(self.file_system)
         self.assertSetEqual(
             ExternalDatasets.testing_intents_set(),
             exp_testing_intents_set
@@ -290,7 +260,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_evaluation_intents_set = {
             "TestEvaluateIntent"
         }
-        ExternalDatasets.set_evaluation_data()
+        ExternalDatasets.set_evaluation_data(self.file_system)
         self.assertSetEqual(
             ExternalDatasets.evaluation_intents_set(),
             exp_evaluation_intents_set
@@ -299,7 +269,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         exp_regression_intents_set = {
             "TestRegressIntent"
         }
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_regression_data(self.file_system)
         self.assertSetEqual(
             ExternalDatasets.regression_intents_set(),
             exp_regression_intents_set
@@ -319,7 +289,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestTrainIntent"
             ]
         }).intent.value_counts()
-        ExternalDatasets.set_training_data()
+        ExternalDatasets.set_training_data(self.file_system)
         print(ExternalDatasets.training_intents_counts())
         print(exp_training_intents_counts)
         self.assertTrue(
@@ -336,7 +306,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestTestIntent"
             ]
         }).intent.value_counts()
-        ExternalDatasets.set_testing_data()
+        ExternalDatasets.set_testing_data(self.file_system)
         self.assertTrue(
             ExternalDatasets.testing_intents_counts().equals(
                 exp_testing_intents_counts
@@ -351,7 +321,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestEvaluateIntent"
             ]
         }).intent.value_counts()
-        ExternalDatasets.set_evaluation_data()
+        ExternalDatasets.set_evaluation_data(self.file_system)
         self.assertTrue(
             ExternalDatasets.evaluation_intents_counts().equals(
                 exp_evaluation_intents_counts
@@ -366,7 +336,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
                 "TestRegressIntent"
             ]
         }).intent.value_counts()
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_regression_data(self.file_system)
         self.assertTrue(
             ExternalDatasets.regression_intents_counts().equals(
                 exp_regression_intents_counts
@@ -385,10 +355,10 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
             "TestEvaluateIntent",
             "TestRegressIntent"
         ])
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_training_data(self.file_system)
+        ExternalDatasets.set_testing_data(self.file_system)
+        ExternalDatasets.set_evaluation_data(self.file_system)
+        ExternalDatasets.set_regression_data(self.file_system)
         self.assertListEqual(
             ExternalDatasets.all_intents(),
             exp_all_intents
@@ -401,19 +371,19 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         :rtype:
         """
         # training vs. testing
-        os.remove(WoodgateSettings.get_training_path())
-        os.remove(WoodgateSettings.get_testing_path())
-        os.remove(WoodgateSettings.get_evaluation_path())
-        os.remove(WoodgateSettings.get_regression_path())
+        os.remove(self.file_system.get_training_path())
+        os.remove(self.file_system.get_testing_path())
+        os.remove(self.file_system.get_evaluation_path())
+        os.remove(self.file_system.get_regression_path())
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_training_path()
+                self.file_system.get_training_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_training_path(), "w+"
+                self.file_system.get_training_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -422,12 +392,12 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_testing_path()
+                self.file_system.get_testing_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_testing_path(), "w+"
+                self.file_system.get_testing_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -436,12 +406,12 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_evaluation_path()
+                self.file_system.get_evaluation_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_evaluation_path(), "w+"
+                self.file_system.get_evaluation_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -450,21 +420,21 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_regression_path()
+                self.file_system.get_regression_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_regression_path(), "w+"
+                self.file_system.get_regression_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
                 "test,TestIntent\n"
             ])
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_training_data(self.file_system)
+        ExternalDatasets.set_testing_data(self.file_system)
+        ExternalDatasets.set_evaluation_data(self.file_system)
+        ExternalDatasets.set_regression_data(self.file_system)
         ExternalDatasets.assert_intents_intersect()
 
     def test_intents_do_not_intersect(self) -> None:
@@ -473,29 +443,29 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         :return:
         :rtype:
         """
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_training_data(self.file_system)
+        ExternalDatasets.set_testing_data(self.file_system)
+        ExternalDatasets.set_evaluation_data(self.file_system)
+        ExternalDatasets.set_regression_data(self.file_system)
         self.assertRaises(
             ValueError,
             ExternalDatasets.assert_intents_intersect,
         )
 
         # train vs. evaluation
-        os.remove(WoodgateSettings.get_training_path())
-        os.remove(WoodgateSettings.get_testing_path())
-        os.remove(WoodgateSettings.get_evaluation_path())
-        os.remove(WoodgateSettings.get_regression_path())
+        os.remove(self.file_system.get_training_path())
+        os.remove(self.file_system.get_testing_path())
+        os.remove(self.file_system.get_evaluation_path())
+        os.remove(self.file_system.get_regression_path())
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_training_path()
+                self.file_system.get_training_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_training_path(), "w+"
+                self.file_system.get_training_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -504,12 +474,12 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_testing_path()
+                self.file_system.get_testing_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_testing_path(), "w+"
+                self.file_system.get_testing_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -518,12 +488,12 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_evaluation_path()
+                self.file_system.get_evaluation_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_evaluation_path(), "w+"
+                self.file_system.get_evaluation_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -532,40 +502,40 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_regression_path()
+                self.file_system.get_regression_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_regression_path(), "w+"
+                self.file_system.get_regression_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
                 "test,TestIntent\n"
             ])
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_training_data(self.file_system)
+        ExternalDatasets.set_testing_data(self.file_system)
+        ExternalDatasets.set_evaluation_data(self.file_system)
+        ExternalDatasets.set_regression_data(self.file_system)
         self.assertRaises(
             ValueError,
             ExternalDatasets.assert_intents_intersect,
         )
 
         # train vs. regression
-        os.remove(WoodgateSettings.get_training_path())
-        os.remove(WoodgateSettings.get_testing_path())
-        os.remove(WoodgateSettings.get_evaluation_path())
-        os.remove(WoodgateSettings.get_regression_path())
+        os.remove(self.file_system.get_training_path())
+        os.remove(self.file_system.get_testing_path())
+        os.remove(self.file_system.get_evaluation_path())
+        os.remove(self.file_system.get_regression_path())
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_training_path()
+                self.file_system.get_training_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_training_path(), "w+"
+                self.file_system.get_training_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -574,12 +544,12 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_testing_path()
+                self.file_system.get_testing_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_testing_path(), "w+"
+                self.file_system.get_testing_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -588,12 +558,12 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_evaluation_path()
+                self.file_system.get_evaluation_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_evaluation_path(), "w+"
+                self.file_system.get_evaluation_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
@@ -602,21 +572,21 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
 
         os.makedirs(
             os.path.dirname(
-                WoodgateSettings.get_regression_path()
+                self.file_system.get_regression_path()
             ),
             exist_ok=True
         )
         with open(
-                WoodgateSettings.get_regression_path(), "w+"
+                self.file_system.get_regression_path(), "w+"
         ) as file:
             file.writelines([
                 "text,intent\n",
                 "test,TestRegressionIntent\n"
             ])
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_training_data(self.file_system)
+        ExternalDatasets.set_testing_data(self.file_system)
+        ExternalDatasets.set_evaluation_data(self.file_system)
+        ExternalDatasets.set_regression_data(self.file_system)
         self.assertRaises(
             ValueError,
             ExternalDatasets.assert_intents_intersect,
@@ -629,10 +599,10 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         :rtype:
         """
 
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
+        ExternalDatasets.set_training_data(self.file_system)
+        ExternalDatasets.set_testing_data(self.file_system)
+        ExternalDatasets.set_evaluation_data(self.file_system)
+        ExternalDatasets.set_regression_data(self.file_system)
 
         exp_intents_dict = {
             "intents": sorted([
@@ -698,11 +668,12 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         :return:
         :rtype:
         """
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
-        ExternalDatasets.create_intents_data_json()
+        ExternalDatasets.set_training_data(self.file_system)
+        ExternalDatasets.set_testing_data(self.file_system)
+        ExternalDatasets.set_evaluation_data(self.file_system)
+        ExternalDatasets.set_regression_data(self.file_system)
+        ExternalDatasets.create_intents_data_json(
+            self.file_system)
         exp_intents_dict = {
             "intents": sorted([
                 "TestTrainIntent",
@@ -757,7 +728,7 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         }
         with open(
                 os.path.join(
-                    WoodgateSettings.datasets_summary_dir,
+                    self.file_system.datasets_summary_dir,
                     "intentsData.json"
                 )
         ) as file:
@@ -765,80 +736,6 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
             print(loaded_dict)
             print(exp_intents_dict)
             self.assertDictEqual(loaded_dict, exp_intents_dict)
-
-    def test_create_bar_plots(self) -> None:
-        """
-
-        :return:
-        :rtype:
-        """
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
-        ExternalDatasets.create_intents_bar_plots()
-        exp_bar_plot_paths_list = [
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_training.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_testing.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_evaluation.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_regression.png"
-            ),
-        ]
-
-        for path in exp_bar_plot_paths_list:
-            self.assertTrue(os.path.isfile(path))
-
-    def test_create_venn_diagram(self) -> None:
-        """
-
-        :return:
-        :rtype:
-        """
-        ExternalDatasets.set_training_data()
-        ExternalDatasets.set_testing_data()
-        ExternalDatasets.set_evaluation_data()
-        ExternalDatasets.set_regression_data()
-        ExternalDatasets.create_intents_venn_diagrams()
-        exp_venn_diagrams_paths_list = [
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_training_evaluation.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_training_testing.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_training_regression.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_evaluation_testing.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_evaluation_regression.png"
-            ),
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_testing_regression.png"
-            ),
-        ]
-
-        for path in exp_venn_diagrams_paths_list:
-            self.assertTrue(os.path.isfile(path))
 
 
 if __name__ == '__main__':

@@ -7,10 +7,8 @@ import os
 import json
 from typing import List, Set, Dict, Union, Any
 import pandas as pd
-from matplotlib_venn import venn2
-import matplotlib.pyplot as plt
 from ..woodgate_logger import WoodgateLogger
-from ..woodgate_settings import WoodgateSettings
+from ..woodgate_settings import FileSystem
 
 
 class ExternalDatasets:
@@ -70,7 +68,7 @@ class ExternalDatasets:
 
     #: The `training_data` attribute represents the fine
     #: tuning data designated as "training data". This dataset
-    #: is used to tune the hyper-parameters during the model
+    #: is used to tune the hyper-parameters during the evaluator
     #: training iterations. This dataset should be a CSV file
     #: having a `.csv` file extension and contain at least two
     #: (2) columns, one (1) for `text` i.e. the user phrase
@@ -80,7 +78,10 @@ class ExternalDatasets:
     training_data: Union[pd.DataFrame, None] = None
 
     @classmethod
-    def set_training_data(cls) -> None:
+    def set_training_data(
+            cls,
+            file_system: FileSystem
+    ) -> None:
         """This method will attempt to set the `training_data`
         attribute by reading the file located on the host
         file system at `$TRAINING_PATH` into a
@@ -93,13 +94,15 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.training_data = pd.read_csv(
-            WoodgateSettings.get_training_path()
+            file_system.get_training_path()
         )
 
         return None
 
     @classmethod
-    def get_training_data(cls) -> pd.DataFrame:
+    def get_training_data(
+            cls
+    ) -> pd.DataFrame:
         """This method is a simple getter which will return the
         `training_data` attribute. Be sure to call the
         `set_training_data` method or else the
@@ -118,7 +121,9 @@ class ExternalDatasets:
     #: with title "intent" in the `training_data`
     #: dataframe.
     @classmethod
-    def training_intents_list(cls) -> List[str]:
+    def training_intents_list(
+            cls
+    ) -> List[str]:
         """This method calls the `get_training_data` method and
         then extracts unique values from the "intent" column. The
         resulting values are returned in a sorted Python list.
@@ -137,10 +142,12 @@ class ExternalDatasets:
     #: with title "intent" in the `training_data`
     #: dataframe.
     @classmethod
-    def training_intents_set(cls) -> Set[str]:
+    def training_intents_set(
+            cls
+    ) -> Set[str]:
         """This method returns the result of
-        `training_intents_list` wrapped in a call to the build in
-        `set` function.
+        `training_intents_list` wrapped in a call to the
+        build_history in `set` function.
 
         :return: A set of intents from training data.
         :rtype: Set[str]
@@ -153,7 +160,9 @@ class ExternalDatasets:
     #: calling `training_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def training_intents_counts(cls) -> pd.Series:
+    def training_intents_counts(
+            cls
+    ) -> pd.Series:
         """This method gets the training data via the
         `get_training_data` method and then returns the result of
         calling the `pd.Series.value_counts` method on the series
@@ -166,7 +175,7 @@ class ExternalDatasets:
 
     #: The `testing_data` attribute represents the fine
     #: tuning data designated as "testing data". This dataset
-    #: is used to tune the hyper-parameters during the model
+    #: is used to tune the hyper-parameters during the evaluator
     #: testing iterations. This dataset should be a CSV file
     #: having a `.csv` file extension and contain at least two
     #: (2) columns, one (1) for `text` i.e. the user phrase
@@ -176,7 +185,10 @@ class ExternalDatasets:
     testing_data: Union[pd.DataFrame, None] = None
 
     @classmethod
-    def set_testing_data(cls) -> None:
+    def set_testing_data(
+            cls,
+            file_system: FileSystem
+    ) -> None:
         """This method will attempt to set the `testing_data`
         attribute by reading the file located on the host
         file system at `$TESTING_PATH` into a `pandas.DataFrame`.
@@ -188,12 +200,14 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.testing_data = pd.read_csv(
-            WoodgateSettings.get_testing_path()
+            file_system.get_testing_path()
         )
         return None
 
     @classmethod
-    def get_testing_data(cls) -> pd.DataFrame:
+    def get_testing_data(
+            cls
+    ) -> pd.DataFrame:
         """This method is a simple getter which will return the
         `testing_data` attribute. Be sure to call the
         `set_testing_data` method or else the
@@ -212,7 +226,9 @@ class ExternalDatasets:
     #: with title "intent" in the `testing_data`
     #: dataframe.
     @classmethod
-    def testing_intents_list(cls) -> List[str]:
+    def testing_intents_list(
+            cls
+    ) -> List[str]:
         """This method calls the `get_testing_data` method and
         then extracts unique values from the "intent" column. The
         resulting values are returned in a sorted Python list.
@@ -231,10 +247,12 @@ class ExternalDatasets:
     #: with title "intent" in the `testing_data`
     #: dataframe.
     @classmethod
-    def testing_intents_set(cls) -> Set[str]:
+    def testing_intents_set(
+            cls
+    ) -> Set[str]:
         """This method returns the result of
-        `testing_intents_list` wrapped in a call to the build in
-        `set` function.
+        `testing_intents_list` wrapped in a call to the
+        build_history in `set` function.
 
         :return: A set of intents from testing data.
         :rtype: Set[str]
@@ -247,7 +265,9 @@ class ExternalDatasets:
     #: calling `testing_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def testing_intents_counts(cls) -> pd.Series:
+    def testing_intents_counts(
+            cls
+    ) -> pd.Series:
         """This method gets the testing data via the
         `get_testing_data` method and then returns the result of
         calling the `pd.Series.value_counts` method on the series
@@ -261,7 +281,7 @@ class ExternalDatasets:
     #: The `evaluation_data` attribute represents the fine
     #: tuning data designated as "evaluation data". This
     #: dataset is used to tune the hyper-parameters during the
-    #: model evaluation iterations. This dataset should be a
+    #: evaluator evaluation iterations. This dataset should be a
     #: CSV file having a `.csv` file extension and contain at
     #: least two (2) columns, one (1) for `text` i.e. the user
     #: phrase
@@ -271,7 +291,10 @@ class ExternalDatasets:
     evaluation_data: Union[pd.DataFrame, None] = None
 
     @classmethod
-    def set_evaluation_data(cls):
+    def set_evaluation_data(
+            cls,
+            file_system: FileSystem
+    ):
         """This method will attempt to set the `testing_data`
         attribute by reading the file located on the host
         file system at `$EVALUATION_PATH` into a
@@ -284,12 +307,14 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.evaluation_data = pd.read_csv(
-            WoodgateSettings.get_evaluation_path()
+            file_system.get_evaluation_path()
         )
         return None
 
     @classmethod
-    def get_evaluation_data(cls) -> pd.DataFrame:
+    def get_evaluation_data(
+            cls
+    ) -> pd.DataFrame:
         """This method is a simple getter which will return the
         `testing_data` attribute. Be sure to call the
         `set_testing_data` method or else the
@@ -309,7 +334,9 @@ class ExternalDatasets:
     #: with title "intent" in the `evaluation_data`
     #: dataframe.
     @classmethod
-    def evaluation_intents_list(cls) -> List[str]:
+    def evaluation_intents_list(
+            cls
+    ) -> List[str]:
         """This method calls the `get_testing_data` method and
         then extracts unique values from the "intent" column. The
         resulting values are returned in a sorted Python list.
@@ -328,10 +355,12 @@ class ExternalDatasets:
     #: with title "intent" in the `evaluation_data`
     #: dataframe.
     @classmethod
-    def evaluation_intents_set(cls) -> Set[str]:
+    def evaluation_intents_set(
+            cls
+    ) -> Set[str]:
         """This method returns the result of
-        `evaluation_intents_list` wrapped in a call to the build
-        in `set` function.
+        `evaluation_intents_list` wrapped in a call to the
+        build_history in `set` function.
 
         :return: A set of intents from evaluation data.
         :rtype: Set[str]
@@ -345,7 +374,9 @@ class ExternalDatasets:
     #: `testing_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def evaluation_intents_counts(cls) -> pd.Series:
+    def evaluation_intents_counts(
+            cls
+    ) -> pd.Series:
         """This method gets the testing data via the
         `get_evaluation_data` method and then returns the result
         of calling the `pd.Series.value_counts` method on the
@@ -359,7 +390,7 @@ class ExternalDatasets:
     #: The `regression_data` attribute represents the fine
     #: tuning data designated as "regression data". This
     #: dataset is used to tune the hyper-parameters during the
-    #: model regression iterations. This dataset should be a
+    #: evaluator regression iterations. This dataset should be a
     #: CSV file having a `.csv` file extension and contain at
     #: least two (2) columns, one (1) for `text` i.e. the user
     #: phrase
@@ -369,7 +400,10 @@ class ExternalDatasets:
     regression_data: pd.DataFrame = None
 
     @classmethod
-    def set_regression_data(cls) -> None:
+    def set_regression_data(
+            cls,
+            file_system: FileSystem
+    ) -> None:
         """This method will attempt to set the `regression_data`
         attribute by reading the file located on the host
         file system at `$REGRESSION_PATH` into a
@@ -382,12 +416,14 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         cls.regression_data = pd.read_csv(
-            WoodgateSettings.get_regression_path()
+            file_system.get_regression_path()
         )
         return None
 
     @classmethod
-    def get_regression_data(cls) -> pd.DataFrame:
+    def get_regression_data(
+            cls
+    ) -> pd.DataFrame:
         """This method is a simple getter which will return the
         `regression_data` attribute. Be sure to call the
         `set_regression_data` method or else the
@@ -407,7 +443,9 @@ class ExternalDatasets:
     #: with title "intent" in the `regression_data`
     #: dataframe.
     @classmethod
-    def regression_intents_list(cls) -> List[str]:
+    def regression_intents_list(
+            cls
+    ) -> List[str]:
         """This method calls the `get_regression_data` method and
         then extracts unique values from the "intent" column. The
         resulting values are returned in a sorted Python list.
@@ -427,10 +465,12 @@ class ExternalDatasets:
     #: with title "intent" in the `regression_data`
     #: dataframe.
     @classmethod
-    def regression_intents_set(cls) -> Set[str]:
+    def regression_intents_set(
+            cls
+    ) -> Set[str]:
         """This method returns the result of
-        `regression_intents_list` wrapped in a call to the build
-        in `set` function.
+        `regression_intents_list` wrapped in a call to the
+        build_history in `set` function.
 
         :return: A set of intents from regression data.
         :rtype: Set[str]
@@ -444,7 +484,9 @@ class ExternalDatasets:
     #: `testing_data.intent.value_counts()`
     #: dataframe.
     @classmethod
-    def regression_intents_counts(cls) -> pd.Series:
+    def regression_intents_counts(
+            cls
+    ) -> pd.Series:
         """This method gets the testing data via the
         `get_evaluation_data` method and then returns the result
         of calling the `pd.Series.value_counts` method on the
@@ -459,11 +501,13 @@ class ExternalDatasets:
     #: unique intents present in the training, testing,
     #: evaluation, and regression datasets.
     @classmethod
-    def all_intents(cls) -> List[str]:
+    def all_intents(
+            cls
+    ) -> List[str]:
         """This method will call all `*_intents_list` methods and
-        compile them into a single list and then call the build
-        in `set` function on the list. The result is then
-        converted back into a list and returned.
+        compile them into a single list and then call the
+        build_history in `set` function on the list. The result
+        is then converted back into a list and returned.
 
         :return: A list of unique intents found across all \
         datasets.
@@ -481,7 +525,9 @@ class ExternalDatasets:
         )
 
     @classmethod
-    def assert_intents_intersect(cls) -> None:
+    def assert_intents_intersect(
+            cls
+    ) -> None:
         """This method will perform a check on the intents found
         across all datasets and throws a ValueError if the sorted
         testing, evaluation, or regression intent sets do not
@@ -537,9 +583,7 @@ class ExternalDatasets:
     #: str-List[str] or str-List[int]. These items are
     #: intent lists or intent count lists respectively.
     @classmethod
-    def intents_dict(cls) -> Dict[
-        str, Any
-    ]:
+    def intents_dict(cls) -> Dict[str, Any]:
         """This method will return a Python dictionary containing
         the intents data found across all datasets.
 
@@ -572,11 +616,14 @@ class ExternalDatasets:
         }
 
     @classmethod
-    def create_intents_data_json(cls) -> None:
+    def create_intents_data_json(
+            cls,
+            file_system: FileSystem
+    ) -> None:
         """This method will create one (1) file containing data
         which describes the distribution of intents across fine
         tuning datasets. The file will be stored in the
-        `WoodgateSettings.datasets_summary_dir` directory
+        `file_system.datasets_summary_dir` directory
         in JSON format with `.json` file extension.
 
         1 - Intents Data
@@ -587,236 +634,12 @@ class ExternalDatasets:
         :rtype: NoneType
         """
         intents_data_json = os.path.join(
-            WoodgateSettings.datasets_summary_dir,
+            file_system.datasets_summary_dir,
             "intentsData.json"
         )
         with open(intents_data_json, "w+") as file:
             file.write(
                 json.dumps(cls.intents_dict())
             )
-
-        return None
-
-    @classmethod
-    def create_intents_bar_plots(cls) -> None:
-        """The method will create four (4) bar plots describing
-        the distribution of intents across the four (4) fine
-        tuning datasets. The plots will be stored in the
-        `WoodgateSettings.datasets_summary_dir` directory
-        as PNG files with `.png` file extensions.
-
-        1 - Training Intents
-                * `intents_bar_plot_training.png`
-        2 - Testing Intents
-                * `intents_bar_plot_testing.png`
-        3 - Evaluation Intents
-                * `intents_bar_plot_evaluation.png`
-        4 - Regression Intents
-                * `intents_bar_plot_regression.png`
-
-        :return: None
-        :rtype: NoneType
-        """
-
-        # Plot 1
-        fig, axs = plt.subplots()
-        axs.title.set_text("Training set")
-        axs.barh(
-            cls.training_intents_list(),
-            cls.training_intents_counts()
-        )
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_training.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 2
-        fig, axs = plt.subplots()
-        axs.title.set_text("Testing set")
-        axs.barh(
-            cls.testing_intents_list(),
-            cls.testing_intents_counts()
-        )
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_testing.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 3
-        fig, axs = plt.subplots()
-        axs.title.set_text("Evaluation set")
-        axs.barh(
-            cls.evaluation_intents_list(),
-            cls.evaluation_intents_counts()
-        )
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_evaluation.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 4
-        fig, axs = plt.subplots()
-        axs.title.set_text("Regression set")
-        axs.barh(
-            cls.regression_intents_list(),
-            cls.regression_intents_counts()
-        )
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_bar_plot_regression.png"
-            )
-        )
-        plt.clf()
-
-        return None
-
-    @classmethod
-    def create_intents_venn_diagrams(cls):
-        """The method will create six (6) Venn diagrams
-        describing two (2) sets and their intersections. The
-        diagrams will be stored in the
-        `WoodgateSettings.datasets_summary_dir`
-        directory as PNG files with `.png` file extensions.
-
-        1 - Training and Evaluation
-                * `intents_venn_training_evaluation.png`
-        2 - Training and Testing
-                * `intents_venn_training_testing.png`
-        3 - Training and Regression
-                * `intents_venn_training_regression.png`
-        4 - Evaluation and Testing
-                * `intents_venn_evaluation_testing.png`
-        5 - Evaluation and Regression
-                * `intents_venn_evaluation_regression.png`
-        6 - Testing and Regression
-                * `intents_venn_testing_regression.png`
-
-        :return: None
-        :rtype: NoneType
-        """
-        plt_title = "Datasets - Intents Venn Diagram - "
-
-        # Plot 1
-        plt.figure(figsize=(4, 4))
-        venn2(
-            [
-                cls.training_intents_set(),
-                cls.evaluation_intents_set(),
-            ],
-            ("Training", "Evaluation")
-        )
-        plt.title(plt_title + "Training and Evaluation")
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_training_evaluation.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 2
-        venn2(
-            [
-                cls.training_intents_set(),
-                cls.testing_intents_set(),
-            ],
-            ("Training", "Testing")
-        )
-        plt.title(plt_title + "Training and Testing")
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_training_testing.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 3
-        venn2(
-            [
-                cls.training_intents_set(),
-                cls.regression_intents_set(),
-            ],
-            ("Training", "Regression")
-        )
-        plt.title(plt_title + "Training and Regression")
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_training_regression.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 4
-        venn2(
-            [
-                cls.evaluation_intents_set(),
-                cls.testing_intents_set(),
-            ],
-            ("Evaluation", "Testing")
-        )
-        plt.title(plt_title + "Evaluation and Testing")
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_evaluation_testing.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 5
-        venn2(
-            [
-                cls.evaluation_intents_set(),
-                cls.regression_intents_set(),
-            ],
-            ("Evaluation", "Regression")
-        )
-        plt.title(plt_title + "Evaluation and Regression")
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_evaluation_regression.png"
-            )
-        )
-        plt.clf()
-
-        # Plot 6
-        venn2(
-            [
-                cls.testing_intents_set(),
-                cls.regression_intents_set(),
-            ],
-            ("Testing", "Regression")
-        )
-        plt.title(plt_title + "Testing and Regression")
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(
-                WoodgateSettings.datasets_summary_dir,
-                "intents_venn_testing_regression.png"
-            )
-        )
-        plt.clf()
 
         return None

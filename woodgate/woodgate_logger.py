@@ -2,9 +2,7 @@
 woodgate_logger.py - The woodgate_logger.py module contains the
 BuildLogger class definition.
 """
-import os
 import logging
-from woodgate.build.file_system_configuration import FileSystemConfiguration
 
 
 class WoodgateLogger:

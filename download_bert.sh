@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Download BERT model
+# Download BERT evaluator
 curl https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-2_H-128_A-2.zip
 
 mkdir ./test

@@ -5,7 +5,7 @@ import os
 import unittest
 from .woodgate_process import WoodgateProcess
 from .woodgate_settings import WoodgateSettings
-from .build.file_system_configuration import \
+from .build_history.file_system_configuration import \
     FileSystemConfiguration
 
 

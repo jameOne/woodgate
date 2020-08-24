@@ -3,25 +3,26 @@ bert_model_parameters.py - This module contains the
 BertModelParameters class definition
 """
 import os
-from typing import List, Union
+from typing import List
 
 
 class BertModelParameters:
     """
     BertModelParameters - The BertModelParameters class
     encapsulates logic related to defining the specific BERT
-    model used for transfer learning.
+    evaluator used for transfer learning.
     """
 
     #: The `ALLOWED_L_VALUES` attribute is a constant which
-    #: represents the number of stacked encoders in BERT model.
+    #: represents the number of stacked encoders in BERT
+    #: evaluator.
     #:
     #: See `https://github.com/google-research/bert` for more on
     #: BERT.
     ALLOWED_L_VALUES: List[int] = [2, 4, 6, 8, 10, 12, 24]
 
     #: The `ALLOWED_H_VALUES` attribute is a constant which
-    #: represents the number of hidden size of the BERT model.
+    #: represents the number of hidden size of the BERT evaluator.
     #:
     #: See `https://github.com/google-research/bert` for more on
     #: BERT.
@@ -29,7 +30,7 @@ class BertModelParameters:
 
     #: The `ALLOWED_A_VALUES` attribute is a constant which
     #: represents the number of head in the attention layers of
-    #: the BERT model.
+    #: the BERT evaluator.
     #:
     #: See `https://github.com/google-research/bert` for more on
     #: BERT.
@@ -41,7 +42,7 @@ class BertModelParameters:
             bert_h_param: int = None
     ) -> None:
         #: The `bert_l_param` attribute represents the number of
-        #: stacked encoders used for the BERT model. This
+        #: stacked encoders used for the BERT evaluator. This
         #: attribute is set via the `BERT_L_PARAM`
         if bert_l_param is None:
             self.bert_l_param: int = int(

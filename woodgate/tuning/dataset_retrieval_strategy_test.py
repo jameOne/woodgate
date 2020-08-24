@@ -9,9 +9,7 @@ import unittest
 import shutil
 from .dataset_retrieval_strategy import DatasetRetrievalStrategy
 from ..tuning.external_datasets import ExternalDatasets
-from ..woodgate_settings import WoodgateSettings
-from ..build.file_system_configuration import \
-    FileSystemConfiguration
+from ..woodgate_settings import Model, Build, FileSystem
 
 
 class TestDatasetRetrieval(unittest.TestCase):
@@ -24,24 +22,19 @@ class TestDatasetRetrieval(unittest.TestCase):
         """
 
         :return:
-        :rtype:
         """
-        FileSystemConfiguration(
-            woodgate_settings=WoodgateSettings
-        )
+        model = Model("test")
+        build = Build()
+        file_system = FileSystem(model, build)
+        file_system.configure()
+        self.file_system = file_system
 
-    @classmethod
-    def tearDownClass(cls) -> None:
+    def tearDown(self) -> None:
         """
 
         :return:
-        :rtype:
         """
-        woodgate_base_dir = os.path.join(
-            os.path.expanduser("~"),
-            "woodgate"
-        )
-        shutil.rmtree(woodgate_base_dir)
+        # shutil.rmtree(self.file_system.woodgate_base_dir)
 
     def test_dataset_retrieval(self) -> None:
         """
@@ -51,18 +44,18 @@ class TestDatasetRetrieval(unittest.TestCase):
         """
         self.assertFalse(
             os.path.isfile(
-                WoodgateSettings.get_training_path()
+                self.file_system.get_training_path()
             )
         )
 
         DatasetRetrievalStrategy.retrieve_tuning_dataset(
             url=ExternalDatasets.training_dataset_url,
-            output=WoodgateSettings.get_training_path()
+            output=self.file_system.get_training_path()
         )
 
         self.assertTrue(
             os.path.isfile(
-                WoodgateSettings.get_training_path()
+                self.file_system.get_training_path()
             )
         )
 

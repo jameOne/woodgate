@@ -6,8 +6,8 @@ import os
 import glob
 import subprocess
 from ..woodgate_logger import WoodgateLogger
-from ..woodgate_settings import WoodgateSettings
 from .bert_model_parameters import BertModelParameters
+from ..woodgate_settings import FileSystem
 
 
 class BertRetrievalStrategy:
@@ -21,10 +21,10 @@ class BertRetrievalStrategy:
             bert_model_parameters: BertModelParameters
     ) -> None:
         #: The `bert_model_parameters` attribute represents the
-        #: specific BERT model intended to be built. The three
-        #: parameters required when choosing a BERT model may
-        #: be set via environment variables `BERT_H_PARAM`,
-        #: `BERT_L_PARAM`, and `BERT_A_PARAM`.
+        #: specific BERT evaluator intended to be built. The
+        #: three parameters required when choosing a BERT
+        #: evaluator may be set via environment variables
+        #: `BERT_H_PARAM`, `BERT_L_PARAM`, and `BERT_A_PARAM`.
         #:
         #: See `https://github.com/google-research/bert` for
         #: more about these parameters.
@@ -32,7 +32,7 @@ class BertRetrievalStrategy:
             bert_model_parameters
 
         #: The `bert_base_url` attribute represents the base
-        #: URL/endpoint where the BERT model is hosted. This
+        #: URL/endpoint where the BERT evaluator is hosted. This
         #: attribute is set via the `BERT_BASE_URL` environment
         #: variable. If the `BERT_BASE_URL` environment variable
         #: is not set, then `bert_base_url` defaults to
@@ -148,7 +148,7 @@ class BertRetrievalStrategy:
             )
         )
 
-    def download_bert(self) -> None:
+    def download_bert(self, file_system: FileSystem) -> None:
         """
 
         :return: None
@@ -157,26 +157,32 @@ class BertRetrievalStrategy:
         # downloading the models is an expensive process
         # so first make sure we actually need the files
         if not glob.glob(
-                f"{WoodgateSettings.get_bert_model_path()}*"
+                f"{file_system.get_bert_model_path()}"
         ) or not os.path.isfile(
-            WoodgateSettings.get_bert_config_path()
+            file_system.get_bert_config_path()
         ) or not os.path.isfile(
-            WoodgateSettings.get_bert_vocab_path()
+            file_system.get_bert_vocab_path()
         ):
             process = subprocess.Popen(
                 [
                     'curl',
-                    self.bert_zip_url
+                    self.bert_zip_url,
+                    '-o',
+                    self.bert_zip_url_component
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
             stdout, stderr = process.communicate()
-            # WoodgateLogger.logger.info(stdout)
-            WoodgateLogger.logger.error(stderr)
+
+            if stdout:
+                WoodgateLogger.logger.info(stdout)
+
+            if stderr:
+                WoodgateLogger.logger.error(stderr)
 
             os.makedirs(
-                WoodgateSettings.bert_dir,
+                file_system.bert_dir,
                 exist_ok=True
             )
 
@@ -185,14 +191,18 @@ class BertRetrievalStrategy:
                     'unzip',
                     self.bert_zip_url_component,
                     '-d',
-                    WoodgateSettings.bert_dir
+                    file_system.bert_dir
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
             stdout, stderr = process.communicate()
-            # WoodgateLogger.logger.info(stdout)
-            WoodgateLogger.logger.error(stderr)
+
+            if stdout:
+                WoodgateLogger.logger.info(stdout)
+
+            if stderr:
+                WoodgateLogger.logger.error(stderr)
 
             process = subprocess.Popen(
                 [
@@ -203,7 +213,11 @@ class BertRetrievalStrategy:
                 stderr=subprocess.PIPE
             )
             stdout, stderr = process.communicate()
-            # WoodgateLogger.logger.info(stdout)
-            WoodgateLogger.logger.error(stderr)
+
+            if stdout:
+                WoodgateLogger.logger.info(stdout)
+
+            if stderr:
+                WoodgateLogger.logger.error(stderr)
 
         return None

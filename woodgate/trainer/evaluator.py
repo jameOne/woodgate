@@ -11,7 +11,7 @@ from tensorflow import keras
 from woodgate.woodgate_settings import FileSystem
 from woodgate.tuning.external_datasets import \
     ExternalDatasets
-from woodgate.preprocessor.preprocessor import Preprocessor
+from woodgate.trainer.preprocessor import Preprocessor
 
 
 class Evaluator:

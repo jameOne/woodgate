@@ -7,7 +7,7 @@ from tensorflow import keras
 from woodgate.woodgate_settings import FileSystem
 
 
-class StorageStrategy:
+class Storage:
     """
     StorageStrategy - The StorageStrategy class encapsulates
     logig related to persisting the evaluator after fine tuning.
