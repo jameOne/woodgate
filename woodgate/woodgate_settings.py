@@ -75,8 +75,8 @@ class Model:
             model_uuid: str = ""
     ):
         #: The `model_name` attribute represents the name given
-        #: to the machine learning evaluator. This attribute is set
-        #: via the `MODEL_NAME` environment variable. If the
+        #: to the machine learning evaluator. This attribute is
+        #: set via the `MODEL_NAME` environment variable. If the
         #: `MODEL_NAME` environment variable is not set, the
         #: `model_name` attribute is set to a random (v4) UUID by
         #: default.
@@ -99,9 +99,9 @@ class Build:
     Build
     """
     #: The `build_version` attribute represents the specific
-    #: version of the evaluator build_history. This attribute is set via
-    #: the `BUILD_VERSION` environment variable. If the
-    #: `BUILD_VERSION` environment variable is not set, the
+    #: version of the evaluator build_history. This attribute
+    #: is set via the `BUILD_VERSION` environment variable. If
+    #: the `BUILD_VERSION` environment variable is not set, the
     #: `build_version` attribute is set to a string formatted
     #: time ("%Y%m%d%H%M%S") by default.
     build_version: str = \
@@ -148,20 +148,38 @@ class FileSystem:
 
         #: The `model_dir` attribute represents the path
         #: to a directory on the host file system where the
-        #: directory learning evaluator will be stored. The evaluator
-        #: build_history directory should be a child directory of the
-        #: build_history directory in which the program will store the
-        #: tuned evaluator after training. This attribute is set via
-        #: the `MODEL_DIR` environment variable. If the
-        #: `MODEL_DIR` environment variable is not set,
-        #: then the `model_dir` attribute will default to
-        #: `$BUILD_DIR/$MODEL_NAME`. The program will attempt to
-        #: create `MODEL_DIR` if it does not already exist.
+        #: directory learning evaluator will be stored. The
+        #: evaluator build_history directory should be a child
+        #: directory of the build_history directory in which the
+        #: program will store the tuned evaluator after training.
+        #: This attribute is set via the `MODEL_DIR` environment
+        #: variable. If the `MODEL_DIR` environment variable is
+        #: not set, then the `model_dir` attribute will default
+        #: to `$BUILD_DIR/$MODEL_NAME`. The program will attempt
+        #: to create `MODEL_DIR` if it does not already exist.
         self.model_dir: str = os.getenv(
             "MODEL_DIR",
             os.path.join(
                 self.woodgate_base_dir,
                 model.model_uuid
+            )
+        )
+
+        #: The `temp_dir` attribute represents the path
+        #: to a directory on the host file system where
+        #: temporary files will be stored. The
+        #: directory should be a child directory of the
+        #: `woodgate_base_dir` directory.
+        #: This attribute is set via the `TEMP_DIR` environment
+        #: variable. If the `TEMP_DIR` environment variable is
+        #: not set, then the `temp_dir` attribute will default
+        #: to `$WOODGATE_BASE_DIR/temp`. The program will attempt
+        #: to create `TEMP_DIR` if it does not already exist.
+        self.temp_dir: str = os.getenv(
+            "TEMP_DIR",
+            os.path.join(
+                self.woodgate_base_dir,
+                "temp"
             )
         )
 
@@ -188,16 +206,16 @@ class FileSystem:
 
         #: The `build_dir` attribute represents the path to a
         #: directory on the host file system where the versioned
-        #: build_history output will be stored. Versioned build_history output
-        #: simply means that individual builds are namespaced by
-        #: version within the `$OUTPUT_DIR`. This attribute is
-        #: set via the `BUILD_DIR` environment variable.
-        #: For example, if the `output_dir` attribute takes the
-        #: value `$OUTPUT_DIR` then the `build_dir` attribute
-        #: should look like `$OUTPUT_DIR/%Y%m%d-%H%M%s` for a
-        #: string formatted date `%Y%m%d-%H%M%s`.
-        #: The program will attempt to create `BUILD_DIR` if it
-        #: does not already exist.
+        #: build_history output will be stored. Versioned
+        #: build_history output simply means that individual
+        #: builds are namespaced by version within the
+        #: `$OUTPUT_DIR`. This attribute is set via the
+        #: `BUILD_DIR` environment variable. For example, if the
+        #: `output_dir` attribute takes the value `$OUTPUT_DIR`
+        #: then the `build_dir` attribute should look like
+        #: `$OUTPUT_DIR/%Y%m%d-%H%M%s` for a string formatted
+        #: date `%Y%m%d-%H%M%s`. The program will attempt to
+        #: create `BUILD_DIR` if it does not already exist.
         self.build_dir: str = os.getenv(
             "BUILD_DIR",
             os.path.join(
@@ -209,14 +227,14 @@ class FileSystem:
         #: The `log_dir` attribute represents the path to a
         #: directory on the host file system where the
         #: log data will be stored. The log data directory should
-        #: be a child directory of the build_history output directory
-        #: in which the program will store the data retrieved for
-        #: logging the build_history process. This attribute is set via
-        #: the `LOG_DIR` environment variable. If the `LOG_DIR`
-        #: environment variable is not set, then the `log_dir`
-        #: attribute will default to `$OUTPUT_DIR/log`. The
-        #: program will attempt to create `LOG_DIR` if it does
-        #: not already exist.
+        #: be a child directory of the build_history output
+        #: directory in which the program will store the data
+        #: retrieved for logging the build_history process. This
+        #: attribute is set via the `LOG_DIR` environment
+        #: variable. If the `LOG_DIR` environment variable is not
+        #: set, then the `log_dir` attribute will default to
+        #: `$OUTPUT_DIR/log`. The program will attempt to create
+        #: `LOG_DIR` if it does not already exist.
         self.log_dir: str = os.getenv(
             "LOG_DIR",
             os.path.join(
@@ -244,11 +262,12 @@ class FileSystem:
         #: training data will be stored. The training data
         #: directory should be a child directory of the evaluator
         #: data directory in which the program will store the
-        #: data retrieved for training the learning evaluator. This
-        #: attribute is set via the `TRAINING_DIR` environment
-        #: variable. If the `TRAINING_DIR` environment variable
-        #: is not set, then the `training_dir` attribute will
-        #: default to `$MODEL_DATA_DIR/train`. The program will
+        #: data retrieved for training the learning evaluator.
+        #: This attribute is set via the `TRAINING_DIR`
+        #: environment variable. If the `TRAINING_DIR`
+        #: environment variable is not set, then the
+        #: `training_dir` attribute will default to
+        #: `$MODEL_DATA_DIR/train`. The program will
         #: attempt to create `TRAINING_DIR` if it does not
         #: already exist.
         self.training_dir: str = os.getenv(
@@ -280,12 +299,13 @@ class FileSystem:
         #: testing data will be stored. The testing data
         #: directory should be a child directory of the evaluator
         #: data directory in which the program will store the
-        #: data retrieved for testing the learning evaluator. This
-        #: attribute is set via the `TESTING_DIR` environment
-        #: variable. If the `TESTING_DIR` environment variable is
-        #: not set, then the `testing_dir` attribute will default
-        #: to `$MODEL_DATA_DIR/test`. The program will attempt to
-        #: create `TESTING_DIR` if it does not already exist.
+        #: data retrieved for testing the learning evaluator.
+        #: This attribute is set via the `TESTING_DIR`
+        #: environment variable. If the `TESTING_DIR` environment
+        #: variable is not set, then the `testing_dir` attribute
+        #: will default to `$MODEL_DATA_DIR/test`. The program
+        #: will attempt to create `TESTING_DIR` if it does not
+        #: already exist.
         self.testing_dir: str = os.getenv(
             "TESTING_DIR",
             os.path.join(
@@ -315,13 +335,14 @@ class FileSystem:
         #: evaluation data will be stored. The evaluation data
         #: directory should be a child directory of the evaluator
         #: data directory in which the program will store the
-        #: dats retrieved for validating the learning evaluator. This
-        #: attribute is set via the `EVALUATION_DIR` environment
-        #: variable. If the `EVALUATION_DIR` environment variable
-        #: is not set, then the `evaluation_dir` attribute will
-        #: default to `$MODEL_DATA_DIR/evaluate`. The program
-        #: will attempt to create `EVALUATION_DIR` if it does not
-        #: already exist.
+        #: dats retrieved for validating the learning evaluator.
+        #: This attribute is set via the `EVALUATION_DIR`
+        #: environment variable. If the `EVALUATION_DIR`
+        #: environment variable is not set, then the
+        #: `evaluation_dir` attribute will default to
+        #: `$MODEL_DATA_DIR/evaluate`. The program will attempt
+        #: to create `EVALUATION_DIR` if it does not already
+        #: exist.
         self.evaluation_dir: str = os.getenv(
             "EVALUATION_DIR",
             os.path.join(
@@ -352,13 +373,14 @@ class FileSystem:
         #: regression data will be stored. The regression data
         #: directory should be a child directory of the evaluator
         #: data directory in which the program will store the
-        #: data retrieved for validating the learning evaluator. This
-        #: attribute is set via the `REGRESSION_DIR` environment
-        #: variable. If the `REGRESSION_DIR` environment variable
-        #: is not set, then the `regression_dir` attribute will
-        #: default to `$MODEL_DATA_DIR/regress`. The program will
-        #: attempt to create `REGRESSION_DIR` if it does not
-        #: already exist.
+        #: data retrieved for validating the learning evaluator.
+        #: This attribute is set via the `REGRESSION_DIR`
+        #: environment variable. If the `REGRESSION_DIR`
+        #: environment variable is not set, then the
+        #: `regression_dir` attribute will default to
+        #: `$MODEL_DATA_DIR/regress`. The program will attempt
+        #: to create `REGRESSION_DIR` if it does not already
+        #: exist.
         self.regression_dir: str = os.getenv(
             "REGRESSION_DIR",
             os.path.join(
@@ -417,8 +439,8 @@ class FileSystem:
         #: The `evaluation_summary_dir` attribute represents a
         #: directory on the host's file system. This is where the
         #: summary files generated by the
-        #: `woodgate.evaluator.evaluation_summary.create_*` methods
-        #: are stored. The program will attempt to
+        #: `woodgate.evaluator.evaluation_summary.create_*`
+        #: methods are stored. The program will attempt to
         #: create `EVALUATION_SUMMARY_DIR` if it does not already
         #: exist.
         self.evaluation_summary_dir: str = os.getenv(

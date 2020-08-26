@@ -34,7 +34,7 @@ class TestDatasetRetrieval(unittest.TestCase):
 
         :return:
         """
-        # shutil.rmtree(self.file_system.woodgate_base_dir)
+        shutil.rmtree(self.file_system.woodgate_base_dir)
 
     def test_dataset_retrieval(self) -> None:
         """
@@ -48,8 +48,9 @@ class TestDatasetRetrieval(unittest.TestCase):
             )
         )
 
-        DatasetRetrievalStrategy.retrieve_tuning_dataset(
-            url=ExternalDatasets.training_dataset_url,
+        DatasetRetrievalStrategy.retrieve_dataset(
+            file_system=self.file_system,
+            file_id=ExternalDatasets.training_dataset_id,
             output=self.file_system.get_training_path()
         )
 

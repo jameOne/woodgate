@@ -6,6 +6,7 @@ import os
 import glob
 import unittest
 import shutil
+import datetime
 from .bert_retrieval_strategy import BertRetrievalStrategy
 from .bert_model_parameters import BertModelParameters
 from ..woodgate_settings import Model, Build, FileSystem
@@ -221,7 +222,6 @@ class TestBertRetrievalStrategy(unittest.TestCase):
 
         :return:
         """
-
         bert_retrieval_strategy = BertRetrievalStrategy(
             bert_model_parameters=BertModelParameters(
                 bert_h_param=128,
@@ -236,6 +236,17 @@ class TestBertRetrievalStrategy(unittest.TestCase):
                 f"{self.file_system.get_bert_model_path()}*"
             )
         )
+        start_time = datetime.datetime.now()
+        bert_retrieval_strategy = BertRetrievalStrategy(
+            bert_model_parameters=BertModelParameters(
+                bert_h_param=128,
+                bert_l_param=2
+            )
+        )
+
+        bert_retrieval_strategy.download_bert(self.file_system)
+        diff_time = datetime.datetime.now() - start_time
+        self.assertTrue(diff_time.total_seconds() < 1)
 
 
 if __name__ == '__main__':

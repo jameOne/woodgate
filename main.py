@@ -6,6 +6,7 @@ import uuid
 import datetime
 from absl import app
 from absl import flags
+
 from woodgate.woodgate_process import WoodgateProcess
 
 FLAGS = flags.FLAGS
@@ -28,42 +29,11 @@ flags.DEFINE_string(
     datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S"),
     """
     #: The `build_version` attribute represents the specific
-    #: version of the evaluator build_history. This attribute is set via
-    #: the `--build_version` command line argument. If the
-    #: `--command_line` command line argument is not set, the
+    #: version of the evaluator build_history. This attribute is
+    #: set via the `--build_version` command line argument. If
+    #: the `--command_line` command line argument is not set, the
     #: `build_version` attribute is set to a string formatted
     #: time ("%Y%m%d-%H%M%s") by default.
-    """
-)
-
-flags.DEFINE_boolean(
-    "create_dataset_visuals",
-    True,
-    """
-    #: The `create_dataset_visuals` attribute represents a
-    #: signal variable that is used to decide whether visuals
-    #: should be generated along with a text summary of the
-    #: training, testing, validation, evaluation, and
-    #: regression datasets. This attribute is set via the
-    #: `--create_dataset_visuals` environment variable. If the
-    #: `--create_dataset_visuals` environment variable is not
-    #: set, then the create_dataset_visuals attribute is set
-    #: to `1` by default signaling the program to generate
-    #: visuals.
-    """
-)
-
-flags.DEFINE_boolean(
-    "create_build_visuals",
-    True,
-    """
-    """
-)
-
-flags.DEFINE_boolean(
-    "create_evaluation_visuals",
-    True,
-    """
     """
 )
 
@@ -115,8 +85,6 @@ flags.DEFINE_string(
 def main(argv) -> None:
     """
 
-    :param argv:
-    :type argv:
     :return:
     :rtype:
     """

@@ -17,7 +17,7 @@ from woodgate.transfer.bert_model_parameters import \
     BertModelParameters
 from woodgate.transfer.bert_retrieval_strategy import \
     BertRetrievalStrategy
-from .woodgate_settings import Model, Build, FileSystem
+from .woodgate_settings import FileSystem, Model
 from .woodgate_settings import Architecture
 
 
@@ -30,7 +30,7 @@ class WoodgateProcess:
     """
 
     @staticmethod
-    def run() -> None:
+    def run(model: Model, file_system: FileSystem) -> None:
         """The `run` method starts the main build_history
         process. The `WoodgateProcess.run()` method is what one
         would likely call from a `main.py` module.
@@ -48,95 +48,99 @@ class WoodgateProcess:
             2) Initialize the file system such that all
             directories which are assumed to exist
         """
+        woodgate_logger = WoodgateLogger(
+            file_system=file_system
+        )
+        logger = woodgate_logger.logger
 
         start_time = datetime.datetime.now()
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Woodgate process started: "
             + f"{start_time.strftime('%Y-%m-%d %H:%M:%s')}"
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Initializing file system configuration"
         )
-        model = Model("test")
-        build = Build()
-        file_system = FileSystem(model, build)
-        file_system.configure()
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Initializing external datasets"
         )
 
         external_datasets = ExternalDatasets()
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Retrieving training data"
         )
 
-        DatasetRetrievalStrategy.retrieve_tuning_dataset(
-            url=external_datasets.training_dataset_url,
+        DatasetRetrievalStrategy.retrieve_dataset(
+            file_system=file_system,
+            file_id=external_datasets.training_dataset_id,
             output=file_system.get_training_path()
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Retrieving testing data"
         )
-        DatasetRetrievalStrategy.retrieve_tuning_dataset(
-            url=external_datasets.testing_dataset_url,
+        DatasetRetrievalStrategy.retrieve_dataset(
+            file_system=file_system,
+            file_id=external_datasets.testing_dataset_id,
             output=file_system.get_testing_path()
 
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Retrieving evaluation data"
         )
-        DatasetRetrievalStrategy.retrieve_tuning_dataset(
-            url=external_datasets.evaluation_dataset_url,
+        DatasetRetrievalStrategy.retrieve_dataset(
+            file_system=file_system,
+            file_id=external_datasets.evaluation_dataset_id,
             output=file_system.get_evaluation_path()
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Retrieving regression data"
         )
-        DatasetRetrievalStrategy.retrieve_tuning_dataset(
-            url=external_datasets.regression_dataset_url,
+        DatasetRetrievalStrategy.retrieve_dataset(
+            file_system=file_system,
+            file_id=external_datasets.regression_dataset_id,
             output=file_system.get_regression_path()
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Setting training data"
         )
         external_datasets.set_training_data(file_system)
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Setting testing data"
         )
         external_datasets.set_testing_data(file_system)
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Setting evaluation data"
         )
         external_datasets.set_evaluation_data(file_system)
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Setting regression data"
         )
         external_datasets.set_regression_data(file_system)
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Creating JSON of intent "
             + "classification bins/buckets"
         )
         external_datasets.create_intents_data_json(file_system)
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Initializing BERT evaluator parameters"
         )
 
         bert_model_parameters = BertModelParameters()
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Initializing BERT retrieval strategy"
         )
 
@@ -144,13 +148,13 @@ class WoodgateProcess:
             bert_model_parameters=bert_model_parameters
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Retrieving BERT evaluator for transfer learning"
         )
 
         bert_retrieval_strategy.download_bert(file_system)
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Processing textual data for training"
         )
 
@@ -161,19 +165,19 @@ class WoodgateProcess:
             external_datasets.all_intents()
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "train x shape: "
             + f"{data.train_x.shape}"
         )
-        WoodgateLogger.logger.info(
+        logger.info(
             "train x element example: "
             + f"{data.train_x[0]}"
         )
-        WoodgateLogger.logger.info(
+        logger.info(
             "train y element example: "
             + f"{data.train_y[0]}"
         )
-        WoodgateLogger.logger.info(
+        logger.info(
             "data max_length_sequence: "
             + f"{data.max_sequence_length}"
         )
@@ -185,7 +189,7 @@ class WoodgateProcess:
             logits_activation="softmax"
         )
 
-        WoodgateLogger.logger.info("Creating BERT evaluator")
+        logger.info("Creating BERT evaluator")
         bert_model = Trainer.model_factory(
             model.model_name,
             external_datasets,
@@ -194,12 +198,12 @@ class WoodgateProcess:
             file_system,
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Printing summary of BERT evaluator"
         )
         bert_model.summary()
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Compiling BERT evaluator"
         )
 
@@ -209,11 +213,12 @@ class WoodgateProcess:
         )
 
         loss = Compiler.loss_factory(
-            "Binary_Crossentropy",
+            "Sparse_Categorical_Crossentropy",
             *["true", "0.5"]
         )
 
-        metrics = Compiler.metrics_factory("binary_crossentropy")
+        metrics = Compiler.metrics_factory(
+            "sparse_categorical_accuracy")
 
         Compiler.compile(
             model=bert_model,
@@ -222,11 +227,11 @@ class WoodgateProcess:
             metrics=metrics
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "BERT evaluator compilation complete"
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Initializing evaluator fitter"
         )
 
@@ -236,7 +241,7 @@ class WoodgateProcess:
             epochs=1,
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Generating build_history history"
         )
         build_history = trainer.fit(
@@ -244,7 +249,7 @@ class WoodgateProcess:
             data=data
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Creating build history JSON"
         )
         trainer.create_build_history_json(
@@ -252,7 +257,7 @@ class WoodgateProcess:
             file_system=file_system
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Evaluating evaluator accuracy"
         )
         Evaluator.evaluate_model_accuracy(
@@ -260,7 +265,7 @@ class WoodgateProcess:
             data=data
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Performing regression testing"
         )
         Evaluator.perform_regression_testing(
@@ -269,27 +274,23 @@ class WoodgateProcess:
             file_system=file_system
         )
 
-        WoodgateLogger.logger.info(
+        logger.info(
             "Creating regression test results JSON"
         )
         Evaluator.create_regression_test_results_json(
             file_system
         )
 
-        WoodgateLogger.logger.info("Saving evaluator to disk")
+        logger.info("Saving evaluator to disk")
         Storage.save_model(
             bert_model=bert_model,
             file_system=file_system
         )
 
         build_duration = datetime.datetime.now() - start_time
-        WoodgateLogger.logger.info(
+        logger.info(
             "Build process completed: "
             + f"{build_duration}"
         )
 
         return None
-
-
-if __name__ == "__main__":
-    WoodgateProcess.run()

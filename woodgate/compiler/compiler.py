@@ -234,6 +234,10 @@ class Compiler:
             metrics_list.append(
                 keras.metrics.Poisson()
             )
+        if "sparse_categorical_accuracy" in args:
+            metrics_list.append(
+                keras.metrics.SparseCategoricalAccuracy()
+            )
         if "sparse_categorical_crossentropy" in args:
             metrics_list.append(
                 keras.metrics.SparseCategoricalCrossentropy()

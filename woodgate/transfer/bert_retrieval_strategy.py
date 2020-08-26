@@ -5,7 +5,7 @@ BertRetrievalStrategy class definition.
 import os
 import glob
 import subprocess
-from ..woodgate_logger import WoodgateLogger
+from typing import Tuple
 from .bert_model_parameters import BertModelParameters
 from ..woodgate_settings import FileSystem
 
@@ -148,76 +148,45 @@ class BertRetrievalStrategy:
             )
         )
 
-    def download_bert(self, file_system: FileSystem) -> None:
+    def download_bert(
+            self,
+            file_system: FileSystem
+    ) -> Tuple[bytes, bytes]:
         """
 
         :return: None
         :rtype: NoneType
         """
+        stdout = bytes()
+        stderr = bytes()
         # downloading the models is an expensive process
         # so first make sure we actually need the files
         if not glob.glob(
-                f"{file_system.get_bert_model_path()}"
+                f"{file_system.get_bert_model_path()}*"
         ) or not os.path.isfile(
             file_system.get_bert_config_path()
         ) or not os.path.isfile(
             file_system.get_bert_vocab_path()
         ):
-            process = subprocess.Popen(
-                [
-                    'curl',
-                    self.bert_zip_url,
-                    '-o',
-                    self.bert_zip_url_component
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-            stdout, stderr = process.communicate()
-
-            if stdout:
-                WoodgateLogger.logger.info(stdout)
-
-            if stderr:
-                WoodgateLogger.logger.error(stderr)
-
-            os.makedirs(
+            bert_zip_path: str = os.path.join(
                 file_system.bert_dir,
-                exist_ok=True
+                self.bert_zip_url_component
             )
+            sh = [
+                f'curl {self.bert_zip_url} -o'
+                + f' {bert_zip_path}',
+                f'unzip {bert_zip_path}'
+                + f' -d {file_system.bert_dir}'
+            ]
 
             process = subprocess.Popen(
-                [
-                    'unzip',
-                    self.bert_zip_url_component,
-                    '-d',
-                    file_system.bert_dir
-                ],
+                "; ".join(sh),
+                shell=True,
+                executable='/bin/bash',
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
+
             stdout, stderr = process.communicate()
 
-            if stdout:
-                WoodgateLogger.logger.info(stdout)
-
-            if stderr:
-                WoodgateLogger.logger.error(stderr)
-
-            process = subprocess.Popen(
-                [
-                    'rm',
-                    f'./{self.bert_zip_url_component}'
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-            stdout, stderr = process.communicate()
-
-            if stdout:
-                WoodgateLogger.logger.info(stdout)
-
-            if stderr:
-                WoodgateLogger.logger.error(stderr)
-
-        return None
+        return stdout, stderr

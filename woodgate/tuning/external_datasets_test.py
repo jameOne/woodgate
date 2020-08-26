@@ -6,8 +6,8 @@ module.
 import os
 import json
 import unittest
+# TODO - Remove dependency on Pandas
 import pandas as pd
-import shutil
 from .external_datasets import ExternalDatasets
 from ..woodgate_settings import Model, FileSystem, Build
 
@@ -77,48 +77,44 @@ class TestExternalDatasetsDefaults(unittest.TestCase):
         :return:
         :rtype:
         """
-        exp_training_dataset_url = (
-                "https://drive.google.com/uc?"
-                + "id=1OlcvGWReJMuyYQuOZm149vHWwPtlboR6"
+        exp_training_dataset_id = (
+                "1OlcvGWReJMuyYQuOZm149vHWwPtlboR6"
         )
 
         # make sure training dataset url has a value
         self.assertEqual(
-            ExternalDatasets.training_dataset_url,
-            exp_training_dataset_url
+            ExternalDatasets.training_dataset_id,
+            exp_training_dataset_id
         )
 
-        exp_testing_dataset_url = (
-                "https://drive.google.com/uc?"
-                + "id=1ep9H6-HvhB4utJRLVcLzieWNUSG3P_uF"
+        exp_testing_dataset_id = (
+                "1ep9H6-HvhB4utJRLVcLzieWNUSG3P_uF"
         )
 
         # make sure testing dataset url has a value
         self.assertEqual(
-            ExternalDatasets.testing_dataset_url,
-            exp_testing_dataset_url
+            ExternalDatasets.testing_dataset_id,
+            exp_testing_dataset_id
         )
 
-        exp_evaluation_dataset_url = (
-                "https://drive.google.com/uc?"
-                + "id=1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
+        exp_evaluation_dataset_id = (
+                "1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
         )
 
         # make sure evaluation dataset url has a value
         self.assertEqual(
-            ExternalDatasets.evaluation_dataset_url,
-            exp_evaluation_dataset_url
+            ExternalDatasets.evaluation_dataset_id,
+            exp_evaluation_dataset_id
         )
 
-        exp_regression_dataset_url = (
-                "https://drive.google.com/uc?"
-                + "id=1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
+        exp_regression_dataset_id = (
+                "1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
         )
 
         # make sure regression dataset url has a value
         self.assertEqual(
-            ExternalDatasets.regression_dataset_url,
-            exp_regression_dataset_url
+            ExternalDatasets.regression_dataset_id,
+            exp_regression_dataset_id
         )
 
     def test_data_setters(self) -> None:

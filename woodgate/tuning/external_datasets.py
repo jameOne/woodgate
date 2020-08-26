@@ -6,8 +6,8 @@ contains the DatasetsConfiguration class definition.
 import os
 import json
 from typing import List, Set, Dict, Union, Any
+# TODO - Remove dependency on Pandas
 import pandas as pd
-from ..woodgate_logger import WoodgateLogger
 from ..woodgate_settings import FileSystem
 
 
@@ -18,52 +18,48 @@ class ExternalDatasets:
     regression datasets.
     """
 
-    #: The `training_dataset_url` attribute represents the
+    #: The `training_dataset_id` attribute represents the
     #: location of the training dataset. This attribute should be
-    #: a valid URL and accessible via the web. The URL will be
-    #: passed to the DatasetRetrievalStrategy class whose
-    #: corresponding retrieve method will be responsible for
-    #: using the URL to download a copy of the dataset.
-    training_dataset_url: str = os.getenv(
-        "TRAINING_DATASET_URL",
-        "https://drive.google.com/uc?"
-        + "id=1OlcvGWReJMuyYQuOZm149vHWwPtlboR6"
+    #: a valid ID and accessible via the web. The
+    #: ID will be passed to the DatasetRetrievalStrategy class
+    #: whose corresponding retrieve method will be responsible
+    #: for using the ID to download a copy of the dataset.
+    training_dataset_id: str = os.getenv(
+        "TRAINING_DATASET_ID",
+        "1OlcvGWReJMuyYQuOZm149vHWwPtlboR6"
     )
 
-    #: The `testing_dataset_url` attribute represents the
+    #: The `testing_dataset_id` attribute represents the
     #: location of the testing dataset. This attribute should be
-    #: a valid URL and accessible via the web. The URL will be
+    #: a valid ID and accessible via the web. The ID will be
     #: passed to the DatasetRetrievalStrategy class whose
     #: corresponding retrieve method will be responsible for
-    #: using the URL to download a copy of the dataset.
-    testing_dataset_url: str = os.getenv(
-        "TESTING_DATASET_URL",
-        "https://drive.google.com/uc?"
-        + "id=1ep9H6-HvhB4utJRLVcLzieWNUSG3P_uF"
+    #: using the ID to download a copy of the dataset.
+    testing_dataset_id: str = os.getenv(
+        "TESTING_DATASET_ID",
+        "1ep9H6-HvhB4utJRLVcLzieWNUSG3P_uF"
     )
 
-    #: The `evaluation_dataset_url` attribute represents the
+    #: The `evaluation_dataset_id` attribute represents the
     #: location of the evaluation dataset. This attribute should
-    #: be a valid URL and accessible via the web. The URL will be
+    #: be a valid ID and accessible via the web. The ID will be
     #: passed to the DatasetRetrievalStrategy class whose
     #: corresponding retrieve method will be responsible for
-    #: using the URL to download a copy of the dataset.
-    evaluation_dataset_url: str = os.getenv(
-        "EVALUATION_DATASET_URL",
-        "https://drive.google.com/uc?"
-        + "id=1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
+    #: using the ID to download a copy of the dataset.
+    evaluation_dataset_id: str = os.getenv(
+        "EVALUATION_DATASET_ID",
+        "1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
     )
 
-    #: The `regression_dataset_url` attribute represents the
+    #: The `regression_dataset_id` attribute represents the
     #: location of the regression dataset. This attribute should
-    #: be a valid URL and accessible via the web. The URL will be
+    #: be a valid ID and accessible via the web. The ID will be
     #: passed to the DatasetRetrievalStrategy class whose
     #: corresponding retrieve method will be responsible for
-    #: using the URL to download a copy of the dataset.
-    regression_dataset_url: str = os.getenv(
-        "REGRESSION_DATASET_URL",
-        "https://drive.google.com/uc?"
-        + "id=1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
+    #: using the ID to download a copy of the dataset.
+    regression_dataset_id: str = os.getenv(
+        "REGRESSION_DATASET_ID",
+        "1Oi5cRlTybuIF2Fl5Bfsr-KkqrXrdt77w"
     )
 
     #: The `training_data` attribute represents the fine
@@ -541,10 +537,6 @@ class ExternalDatasets:
         # be unequal to the set of training intents.
         if cls.training_intents_list() \
                 != cls.testing_intents_list():
-            WoodgateLogger.logger.warn(
-                "training intents not equal to number of "
-                + "testing intents"
-            )
             raise ValueError(
                 "training intents and "
                 + "testing intents do not intersect"
@@ -554,10 +546,6 @@ class ExternalDatasets:
         # to be unequal to the set of training intents.
         if cls.training_intents_list() \
                 != cls.evaluation_intents_list():
-            WoodgateLogger.logger.warn(
-                "training intents not equal to number of "
-                + "evaluation intents"
-            )
             raise ValueError(
                 "training intents and "
                 + "evaluation intents do not intersect"
@@ -567,10 +555,6 @@ class ExternalDatasets:
         # to be unequal to the set of training intents.
         if cls.training_intents_list() \
                 != cls.regression_intents_list():
-            WoodgateLogger.logger.warn(
-                "training intents not equal to number of "
-                + "regression intents"
-            )
             raise ValueError(
                 "training intents and "
                 + "regression intents do not intersect"
