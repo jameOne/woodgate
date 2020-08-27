@@ -32,8 +32,7 @@ class Trainer:
             validation_split: float,
             batch_size: int,
             epochs: int,
-            use_tensorboard_callback: bool = False,
-            log_dir: str = None
+            file_system: FileSystem = None
     ):
         """
 
@@ -77,35 +76,7 @@ class Trainer:
         #: attribute will default to `5`.
         self.epochs: int = epochs
 
-        #: The `use_tensorboard_callback` attribute represents a
-        #: signal variable that is used to decide whether
-        #: tensorboard logs should be generated along with
-        #: build_history logs. This attribute is set via the
-        #: `CREATE_TENSORBOARD_LOGS` environment
-        #: variable. If the `CREATE_TENSORBOARD_LOGS` environment
-        #: variable is not set, then the
-        #: `use_tensorboard_callback` attribute is set to `1`
-        #: by default signaling the program to generate
-        #: tensorboard logs. All values except
-        #: `CREATE_TENSORBOARD_LOGS=0` signal the program
-        #: to generate tensorboard logs.
-        self.use_tensorboard_callback: bool = \
-            use_tensorboard_callback
-
-        #: The `log_dir` attribute represents the path to a
-        #: directory on the host file system where the
-        #: log data will be stored. The log data directory should
-        #: be a child directory of the build_history output
-        #: directory in which the program will store the data
-        #: retrieved for logging the build_history process. This
-        #: attribute is set via the `LOG_DIR` environment
-        #: variable. If the `LOG_DIR` environment variable is
-        #: not set, then the `log_dir` attribute will default to
-        #: `$OUTPUT_DIR/log`. The program will attempt to create
-        #: `LOG_DIR` if it does not already exist. This attribute
-        #: is only used if `use_tensorboard_callback` is True.
-        if self.use_tensorboard_callback:
-            self.log_dir = log_dir
+        self.file_system = file_system
 
     @staticmethod
     def model_factory(
@@ -209,10 +180,10 @@ class Trainer:
         """
 
         callbacks = list()
-        if self.use_tensorboard_callback:
+        if self.file_system is not None:
             callbacks.append(
                 keras.callbacks.TensorBoard(
-                    log_dir=self.log_dir
+                    log_dir=self.file_system.log_dir
                 )
             )
 

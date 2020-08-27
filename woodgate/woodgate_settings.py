@@ -7,10 +7,55 @@ import uuid
 import datetime
 
 
+class Model:
+    """
+    Model
+    """
+
+    def __init__(
+            self,
+            model_name: str,
+            model_uuid: str = ""
+    ):
+        #: The `model_name` attribute represents the name given
+        #: to the machine learning model. This attribute is
+        #: set via the `MODEL_NAME` environment variable. If the
+        #: `MODEL_NAME` environment variable is not set, the
+        #: `model_name` attribute is set to a random (v4) UUID by
+        #: default.
+        self.model_name: str = model_name
+
+        #: The `model_uuid` attribute represents the name given
+        #: to the machine learning model. The `model_uuid`
+        #: attribute is set to a random (v4) UUID.
+        try:
+            model_uuid = uuid.UUID(model_uuid, version=4)
+            self.model_uuid: str = str(model_uuid)
+        except ValueError:
+            # TODO - This should be logged.
+            self.model_uuid: str = str(uuid.uuid4())
+
+
 class Architecture:
     """
     Architecture
     """
+
+    ACTIVATIONS = [
+        "linear",
+        "hard_sigmoid",
+        "exponential",
+        "sigmoid",
+        "tanh",
+        "relu",
+        "swish",
+        "softsign",
+        "softplus",
+        "selu",
+        "elu",
+        "softmax"
+    ]
+
     def __init__(
             self,
             clf_out_dropout_rate: float,
@@ -44,7 +89,10 @@ class Architecture:
         #: `CLF_OUT_ACTIVATION` environment variable. If the
         #: `CLF_OUT_ACTIVATION` environment variable is not set,
         #: then the `clf_out_activation` defaults to `tanh`.
-        self.clf_out_activation: str = clf_out_activation
+        if clf_out_activation in self.ACTIVATIONS:
+            self.clf_out_activation: str = clf_out_activation
+        else:
+            raise ValueError("invalid activation identifier")
 
         #: The `logits_dropout_rate` attribute represents two
         #: of two (2 / 2) dropout rates which may be customized.
@@ -61,37 +109,10 @@ class Architecture:
         #: `LOGITS_ACTIVATION` environment variable. If the
         #: `LOGITS_ACTIVATION` environment variable is not set,
         #: then the `logits_activation` defaults to `tanh`.
-        self.logits_activation: str = logits_activation
-
-
-class Model:
-    """
-    Model
-    """
-
-    def __init__(
-            self,
-            model_name: str,
-            model_uuid: str = ""
-    ):
-        #: The `model_name` attribute represents the name given
-        #: to the machine learning evaluator. This attribute is
-        #: set via the `MODEL_NAME` environment variable. If the
-        #: `MODEL_NAME` environment variable is not set, the
-        #: `model_name` attribute is set to a random (v4) UUID by
-        #: default.
-        self.model_name: str = model_name
-
-        #: The `model_uuid` attribute represents the name given
-        #: to the machine learning evaluator. The `model_uuid`
-        #: attribute is set to a random (v4) UUID. This attribute
-        #: cannot be manually set.
-        try:
-            model_uuid = uuid.UUID(model_uuid, version=4)
-            self.model_uuid: str = str(model_uuid)
-        except ValueError:
-            # TODO - This should be logged.
-            self.model_uuid: str = str(uuid.uuid4())
+        if logits_activation in self.ACTIVATIONS:
+            self.logits_activation: str = logits_activation
+        else:
+            raise ValueError("invalid activation identifier")
 
 
 class Build:
